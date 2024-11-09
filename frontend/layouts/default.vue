@@ -3,42 +3,42 @@
     <!-- Sidebar fijo sin fondo negro -->
     <v-navigation-drawer
       app
-      clipped
+      elevation="1"
+      color="white"
       :mini-variant="miniVariant"
       :right="right"
-      color="#0484b4"
     >
       <v-list>
+        <!-- Logo and Text -->
+        <v-list-item class="logo-container">
+          <v-icon color="#3B9AB8" class="mr-2">
+            mdi-medication
+          </v-icon>
+          <v-list-item-title class="logo-text">
+            Healthi
+          </v-list-item-title>
+        </v-list-item>
+
+        <!-- Sidebar Items -->
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
           :to="item.to"
           link
           class="sidebar-item"
+          :class="{ 'selected-item': $route.path === item.to }"
         >
-          <v-list-item-icon style="margin-right: 4px;">
-            <v-icon style="color:white">
-              {{ item.icon }}
-            </v-icon>
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title style="color: white; margin-left: 0;">
+            <v-list-item-title>
               {{ item.title }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
-    <!-- Barra de navegación superior que se superpone -->
-    <v-app-bar app color="#003A70" clipped-left style="z-index: 1000; color:white">
-      <!-- Contenedor para la imagen y el título -->
-      <div style="display: flex; align-items: center;">
-        <!--<img src="/escudo1.png" alt="Company Logo" class="nav-company-logo" style="margin-right: 8px;">-->
-      </div>
-      <!-- Empuja cualquier otro contenido a la derecha -->
-      <v-spacer />
-    </v-app-bar>
 
     <!-- Contenido principal -->
     <v-main>
@@ -52,45 +52,33 @@ export default {
   name: 'DefaultLayout',
   data () {
     return {
-      clipped: false,
       miniVariant: false,
       right: false,
-      title: 'Administrador de archivos',
       items: [
         {
-          icon: 'mdi-home',
-          title: 'Inicio',
-          to: '/inicio'
+          icon: 'mdi-view-dashboard',
+          title: 'Dashboard',
+          to: '/dashboard'
         },
         {
-          icon: 'mdi-magnify',
-          title: 'Consulta de expediente',
-          to: '/consulta-expediente'
+          icon: 'mdi-calendar',
+          title: 'Calendar',
+          to: '/calendar'
         },
         {
-          icon: 'mdi-handshake',
-          title: 'Solicitud de préstamo',
-          to: '/solicitud-prestamo'
+          icon: 'mdi-account',
+          title: 'Profile',
+          to: '/profile'
         },
         {
-          icon: 'mdi-school',
-          title: 'Solicitud de asesoría',
-          to: '/asesoria'
+          icon: 'mdi-help-circle',
+          title: 'Help',
+          to: '/help'
         },
         {
-          icon: 'mdi-swap-horizontal',
-          title: 'Solicitud de transferencia',
-          to: '/solicitud-transferencia'
-        },
-        {
-          icon: 'mdi-file-document',
-          title: 'Consulta de expedientes',
-          to: '/consulta-expediente'
-        },
-        {
-          icon: 'mdi-history',
-          title: 'Historial de transferencias',
-          to: '/historial-transferencia'
+          icon: 'mdi-logout',
+          title: 'Logout',
+          to: '/'
         }
       ]
     }
@@ -98,23 +86,36 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .sidebar-item {
+  background-color: white;
   margin-bottom: 10px;
 }
 
+.selected-item {
+  background-color: #3B9AB8 !important;
+}
+
 .v-list-item-icon {
-  margin-right: 4px;
+  margin-right: 8px;
+  color: black;
 }
 
 .v-list-item-title {
   margin-left: 0;
+  color: black;
 }
 
-.nav-company-logo {
-  width: 30%;
-  height: auto;
-  margin-left: 20px;
-  margin-right: auto;
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo-text {
+  color: #3B9AB8;
+  font-weight: bold;
+  font-size: 24px;
 }
 </style>
