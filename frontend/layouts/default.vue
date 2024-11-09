@@ -34,7 +34,7 @@
     <v-app-bar app color="#003A70" clipped-left style="z-index: 1000; color:white">
       <!-- Contenedor para la imagen y el título -->
       <div style="display: flex; align-items: center;">
-        <img src="/escudo1.png" alt="Company Logo" class="nav-company-logo" style="margin-right: 8px;">
+        <!--<img src="/escudo1.png" alt="Company Logo" class="nav-company-logo" style="margin-right: 8px;">-->
       </div>
       <!-- Empuja cualquier otro contenido a la derecha -->
       <v-spacer />
