@@ -124,6 +124,7 @@ export default {
   background-color: #3B9AB8 !important;
   color: white !important;
   transition: background-color 0.3s, color 0.3s;
+  margin-left: 0px;
 }
 
 /* New Content Styles */
