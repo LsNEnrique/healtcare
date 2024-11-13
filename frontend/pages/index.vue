@@ -1,27 +1,34 @@
 <template>
   <v-app>
-    <v-app-bar color="white" fixed app elevation="0" class="app-bar">
-      <!-- Logo and Text -->
-      <v-toolbar-title>
-        <v-icon color="#3B9AB8">
-          mdi-medication
-        </v-icon>
-        <span class="title">Healthi</span>
-        <v-spacer />
-      </v-toolbar-title>
-
-      <!-- Buttons on the right -->
-      <div>
-        <v-btn class="gopro-btn" text @click="$router.push('/gopro')">
-          Go Pro
-        </v-btn>
-        <v-btn class="login-btn" text @click="$router.push('/login')">
-          Login
-        </v-btn>
-        <v-btn class="register-btn" text @click="$router.push('/register')">
-          Register
-        </v-btn>
-      </div>
+    <v-app-bar color="white" fixed app elevation="0">
+      <v-container>
+        <v-row align="center">
+          <!-- App Bar Icon -->
+          <v-col class="d-flex align-center" cols="auto">
+            <v-icon color="#3B9AB8">
+              mdi-medication
+            </v-icon>
+          </v-col>
+          <!-- Title -->
+          <v-col class="d-flex align-center" cols="auto">
+            <span class="title">Healthi</span>
+          </v-col>
+          <!-- Spacer to push action items to the far right -->
+          <v-spacer />
+          <!-- Action Items -->
+          <v-col class="d-flex justify-end" cols="auto">
+            <v-btn class="gopro-btn" text @click="$router.push('/gopro')">
+              Go Pro
+            </v-btn>
+            <v-btn class="login-btn" text @click="$router.push('/login')">
+              Login
+            </v-btn>
+            <v-btn class="register-btn" text @click="$router.push('/register')">
+              Register
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-app-bar>
 
     <!-- Top container -->
@@ -98,12 +105,6 @@ export default {
 </script>
 
 <style scoped>
-.app-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .title {
   color: #3B9AB8;
   margin-left: 10px;
@@ -124,7 +125,8 @@ export default {
   background-color: #3B9AB8 !important;
   color: white !important;
   transition: background-color 0.3s, color 0.3s;
-  margin-left: 0px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 /* New Content Styles */
@@ -152,7 +154,7 @@ export default {
   width: 401px;
   height: 309px;
   top: -48px;
-  left: 480px;
+  left: 680px;
   gap: 0px;
   opacity: 1;
 }

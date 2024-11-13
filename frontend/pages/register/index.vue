@@ -130,7 +130,7 @@ export default {
   <style scoped>
   .register-container {
     display: flex;
-    height: 100vh;
+    height: 150vh;
   }
 
   .left-side {

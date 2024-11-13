@@ -88,7 +88,7 @@ export default {
   <style scoped>
   .login-container {
     display: flex;
-    height: 100vh;
+    height: 120vh;
   }
 
   .left-side {
