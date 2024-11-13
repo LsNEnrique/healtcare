@@ -40,9 +40,69 @@
       </v-list>
     </v-navigation-drawer>
 
+    <!-- Profile -->
+    <v-app>
+      <v-app-bar v-if="isProfilePage" app>
+        <!-- Contenido del app-bar -->
+        <div class="d-flex flex-column">
+          <div class="text-h6 font-weight-bold">
+            Hi, {{ patientName }}
+          </div>
+          <div class="text-h4 font-weight-bold">
+            Profile
+          </div>
+        </div>
+        <v-spacer />
+        <v-menu offset-y>
+          <template #activator="{ on, attrs }">
+            <v-btn v-bind="attrs" icon v-on="on">
+              <v-icon>mdi-translate</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
+              <v-list-item-title>{{ lang }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-btn icon>
+          <v-icon>mdi-bell</v-icon>
+        </v-btn>
+        <v-avatar class="ml-2">
+          <img :src="patientPhoto" alt="Patient photo">
+        </v-avatar>
+        <span class="ml-2 font-weight-bold">{{ patientName }}</span>
+      </v-app-bar>
+      <!-- Botones de navegación -->
+      <v-container v-if="isProfilePage" class="d-flex justify-space-around mt-16 pt-3">
+        <nuxt-link to="/profile/general">
+          <v-btn color="primary" outlined>
+            General
+          </v-btn>
+        </nuxt-link>
+        <nuxt-link to="/profile/consultation-history">
+          <v-btn color="primary" outlined>
+            Consultation History
+          </v-btn>
+        </nuxt-link>
+        <nuxt-link to="/profile/patient-documents">
+          <v-btn color="primary" outlined>
+            Patient Documents
+          </v-btn>
+        </nuxt-link>
+      </v-container>
+
+      <!-- Contenedor principal -->
+      <v-main>
+        <v-container class="mt-10">
+          <!-- Renderiza el contenido de la página -->
+          <nuxt />
+        </v-container>
+      </v-main>
+    </v-app>
     <!-- Contenido principal -->
     <v-main>
-      <Nuxt />
+      <nuxt />
     </v-main>
   </v-app>
 </template>
@@ -52,6 +112,9 @@ export default {
   name: 'DefaultLayout',
   data () {
     return {
+      patientName: 'John Doe',
+      patientPhoto: 'https://example.com/path/to/photo.jpg',
+      languages: ['English', 'Spanish', 'French'],
       miniVariant: false,
       right: false,
       items: [
@@ -68,7 +131,7 @@ export default {
         {
           icon: 'mdi-account',
           title: 'Profile',
-          to: '/profile'
+          to: '/profile/general'
         },
         {
           icon: 'mdi-help-circle',
@@ -81,6 +144,17 @@ export default {
           to: '/'
         }
       ]
+    }
+  },
+  computed: {
+    // Verifica si la página actual es parte de la sección `profile`
+    isProfilePage () {
+      return this.$route.path.startsWith('/profile')
+    }
+  },
+  methods: {
+    changeLanguage (lang) {
+      console.log(`Idioma cambiado a: ${lang}`)
     }
   }
 }
