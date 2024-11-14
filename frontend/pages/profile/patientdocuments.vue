@@ -36,9 +36,9 @@ template{
 
 .document-container {
   padding: 20px;
-  background-color: white; /* Fondo blanco */
-  border: 1px solid #ddd; /* Borde gris claro */
-  border-radius: 8px; /* Bordes redondeados */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   width: 98%;
   margin-left: 1%;
 }
@@ -56,7 +56,7 @@ template{
 }
 
 .new-document-btn {
-  background-color: #1976D2; /* Color azul */
+  background-color: #1976D2;
   color: white;
 }
 

@@ -45,8 +45,8 @@ export default {
   layout: 'DefaultLayout',
   data () {
     return {
-      selectedMonth: null, // Mes seleccionado
-      selectedYear: 2024, // Año seleccionado
+      selectedMonth: null,
+      selectedYear: 2024,
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       appointments: [
         { date: this.getYesterday(), time: '10:00 AM', description: 'Check-up' },
@@ -98,12 +98,8 @@ export default {
       return date.toISOString().split('T')[0] // YYYY-MM-DD
     },
     selectMonthYear () {
-      console.log('Select Month/Year clicked')
-      // Lógica para seleccionar mes/año
     },
     createNewAppointment () {
-      console.log('Create New Appointment clicked')
-      // Lógica para crear una nueva cita
     }
   }
 }
@@ -158,9 +154,9 @@ export default {
 }
 
 .new-appointment-btn:hover {
-  background-color: #1976D2;  /* Mantiene el azul */
-  color: white;  /* Letras blancas */
-  opacity: 0.9;  /* Efecto hover */
+  background-color: #1976D2;
+  color: white;
+  opacity: 0.9;
 }
 
 .appointments {

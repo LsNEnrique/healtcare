@@ -158,7 +158,6 @@ export default {
   },
   methods: {
     changeLanguage (lang) {
-      console.log(`Idioma cambiado a: ${lang}`)
     },
     selectButton (button) {
       this.selectedButton = button
