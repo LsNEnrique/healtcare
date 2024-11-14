@@ -53,11 +53,74 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
-    <!-- Contenido principal -->
-    <v-main>
-      <Nuxt />
-    </v-main>
+    <!-- Profile -->
+    <div class="app-background">
+      <!-- Div que se muestra solo en la vista de perfil -->
+      <div v-if="isProfilePage" class="profile-container">
+        <!-- Encabezado personalizado -->
+        <div class="app-bar">
+          <div class="d-flex flex-column">
+            <div class="text-h6 font-weight-bold">
+              Hi, {{ patientName }}
+            </div>
+            <div class="text-h4 font-weight-bold">
+              Profile
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="menu-wrapper">
+              <v-menu offset-y>
+                <template #activator="{ on, attrs }">
+                  <div v-bind="attrs" class="icon-button" v-on="on">
+                    <v-icon>mdi-translate</v-icon>
+                  </div>
+                </template>
+                <v-list>
+                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
+                    <v-list-item-title>{{ lang }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+            <div class="icon-button">
+              <v-icon>mdi-bell</v-icon>
+            </div>
+            <div class="ml-2">
+              <v-avatar>
+                <img :src="patientPhoto" alt="Patient photo">
+              </v-avatar>
+            </div>
+            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
+          </div>
+        </div>
+        <div class="navigation-buttons mt-1 mb-2 pt-3">
+          <nuxt-link to="/profile/general">
+            <div class="button-row">
+              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'general' }" outlined @click="selectButton('general')">
+                General
+              </v-btn>
+            </div>
+          </nuxt-link>
+          <nuxt-link to="/profile/consultation">
+            <div class="button-row">
+              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'consultation' }" outlined @click="selectButton('consultation')">
+                Consultation History
+              </v-btn>
+            </div>
+          </nuxt-link>
+          <nuxt-link to="/profile/patientdocuments">
+            <div class="button-row">
+              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'documents' }" outlined @click="selectButton('documents')">
+                Patient Documents
+              </v-btn>
+            </div>
+          </nuxt-link>
+        </div>
+      </div>    <!-- Contenido principal -->
+      <v-main>
+        <nuxt />
+      </v-main>
+    </div>
   </v-app>
 </template>
 
@@ -66,6 +129,10 @@ export default {
   name: 'DefaultLayout',
   data () {
     return {
+      patientName: 'John Doe',
+      patientPhoto: 'https://example.com/path/to/photo.jpg',
+      languages: ['English', 'Spanish', 'French'],
+      selectedButton: 'general',
       miniVariant: false,
       right: false,
       items: [
@@ -82,7 +149,7 @@ export default {
         {
           icon: 'mdi-account',
           title: 'Profile',
-          to: '/profile'
+          to: '/profile/general'
         },
         {
           icon: 'mdi-help-circle',
@@ -95,6 +162,19 @@ export default {
           to: '/'
         }
       ]
+    }
+  },
+  computed: {
+    // Verifica si la página actual es parte de la sección `profile`
+    isProfilePage () {
+      return this.$route.path.startsWith('/profile')
+    }
+  },
+  methods: {
+    changeLanguage (lang) {
+    },
+    selectButton (button) {
+      this.selectedButton = button
     }
   }
 }
@@ -178,5 +258,58 @@ export default {
   color: #3B9AB8;
   font-weight: bold;
   font-size: 32px;
+}
+
+.app-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 83.1%;
+  margin-left: auto; /* Alinea la barra a la derecha */
+  padding: 16px;
+  background-color: #f5f5f5;
+  position: relative;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+
+}
+.app-background {
+  background-color: #f5f5f5; /* Mismo color que el app-bar */
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.app-main {
+  margin-top: 80px;
+}
+
+.icon-button {
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.navigation-buttons {
+  display: flex;
+  width: 82.3%;
+  flex-direction: row;
+  margin-left: auto;
+  align-items: flex-start;
+  background-color: #f5f5f5;
+}
+
+.button-row {
+  margin-bottom: 0; /* Elimina el margen inferior */
+}
+
+.nav-btn {
+  border-color: #e0e0e0;
+  color: #e0e0e0;
+}
+.selected-btn {
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000000 !important;
 }
 </style>
