@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
+import { User } from '../models/userModel';
 
 interface UserBody {
   email: string;
@@ -12,7 +12,7 @@ interface UserBody {
   telefono?: string;
 }
 
-const loginUser = async (req: Request, res: Response): Promise<void> => {
+const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password }: { email: string; password: string } = req.body;
 
@@ -49,7 +49,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const registerUser = async (req: Request, res: Response): Promise<void> => {
+const registerUser = async (req: Request, res: Response) => {
   try {
     const { email, password, nombre, apaterno, amaterno, direccion, telefono }: UserBody = req.body;
     const existingUser = await User.findByEmail(email);

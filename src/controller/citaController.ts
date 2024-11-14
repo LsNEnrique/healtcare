@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Citas } from '../models/Cita';
+import { Citas } from '../models/citaModel';
 import { messaging } from 'firebase-admin';
 
 // Definir tipos para los parámetros de la cita (doctorId, pacienteId, fecha)
@@ -9,7 +9,7 @@ interface CitaRequestBody {
   fecha: string;
 }
 
-const crearCita = async (req: Request, res: Response): Promise<void> => {
+const crearCita = async (req: Request, res: Response) => {
   try {
     const { doctorId, pacienteId, fecha }: CitaRequestBody = req.body;
 

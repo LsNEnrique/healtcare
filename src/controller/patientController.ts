@@ -10,7 +10,7 @@ interface PatientData {
   direccion: string;
 }
 
-const registerPatient = async (req: Request, res: Response): Promise<void> => {
+const registerPatient = async (req: Request, res: Response) => {
   try {
     const { nombre, edad, sexo, telefono, email, direccion }: PatientData = req.body;
 

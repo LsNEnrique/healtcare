@@ -8,7 +8,7 @@ interface CustomRequest extends Request {
   user?: any; // Aquí podemos definir mejor el tipo del usuario según cómo sea la estructura de 'user' después de la verificación del JWT
 }
 
-const authenticateToken = (req: CustomRequest, res: Response, next: NextFunction): void => {
+const authenticateToken = (req: CustomRequest, res: Response, next: NextFunction) => {
   const token = req.headers['authorization'];
   if (!token) {
     return res.status(401).json({
