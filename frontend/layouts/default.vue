@@ -152,11 +152,6 @@ export default {
           to: '/profile/general'
         },
         {
-          icon: 'mdi-help-circle',
-          title: 'Help',
-          to: '/help'
-        },
-        {
           icon: 'mdi-logout',
           title: 'Logout',
           to: '/'
