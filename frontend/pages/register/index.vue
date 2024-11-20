@@ -70,7 +70,7 @@
                 </template>
                 <v-date-picker v-model="birthDate" no-title @input="datePickerMenu = false" />
               </v-menu>
-              <v-btn class="register-button" block color="#3B9AB8" @click="$router.push('//dashboard-after')">
+              <v-btn class="register-button" block color="#3B9AB8" @click="$router.push('/dashboard-after')">
                 Sign Up
               </v-btn>
             </v-form>
