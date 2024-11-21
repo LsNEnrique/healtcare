@@ -76,6 +76,7 @@
 
 <script>
 export default {
+  layout: 'default_doctor',
   data () {
     return {
       currentMonth: 'November',

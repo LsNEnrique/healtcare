@@ -94,7 +94,7 @@
 
 <script>
 export default {
-  layout: 'DefaultLayoutDoctor',
+  layout: 'default_doctor',
   data () {
     return {
       availability: 'enable',

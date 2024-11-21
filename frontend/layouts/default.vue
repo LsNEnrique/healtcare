@@ -87,7 +87,7 @@
             </div>
             <div class="ml-2">
               <v-avatar>
-                <img :src="patientPhoto" alt="Patient photo">
+                <img :src="require('@/assets/patient_photo.jpg')" alt="Patient photo">
               </v-avatar>
             </div>
             <span class="ml-2 font-weight-bold">{{ patientName }}</span>
@@ -116,7 +116,78 @@
             </div>
           </nuxt-link>
         </div>
-      </div>    <!-- Contenido principal -->
+      </div>
+      <!-- Div que se muestra solo en el dashboard del paciente -->
+      <div v-if="isPatientDashboard" class="patient-container">
+        <!-- Encabezado personalizado -->
+        <div class="app-bar">
+          <div class="d-flex flex-column">
+            <div class="text-h6 font-weight-bold">
+              Hi, {{ patientName }}
+            </div>
+            <div class="text-h4 font-weight-bold">
+              Welcome Back
+            </div>
+          </div>
+          <!-- Search bar -->
+          <div
+            class="search-container d-flex mt-2 align-items-center"
+            style="background-color: #d6d6d6; border-radius: 10px; padding: 10px; margin: 0 10px;"
+          >
+            <v-text-field
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Find doctors"
+              background-color="#d6d6d6"
+              style=" color: black; border-radius: 10px; margin-right: 10px;"
+              solo
+              flat
+              hide-details
+            />
+            <v-select
+              :items="['Location']"
+              background-color="#d6d6d6"
+              style="color: black; border-radius: 10px; margin-right: 10px;"
+              prepend-inner-icon="mdi-crosshairs-gps"
+              solo
+              flat
+              hide-details
+            />
+            <v-btn
+              style="background-color: #3B9AB8; color: white; border-radius: 10px; white-space: nowrap;"
+              class="ml-2"
+            >
+              Search
+            </v-btn>
+          </div>
+          <div class="d-flex">
+            <div class="menu-wrapper">
+              <v-menu offset-y>
+                <template #activator="{ on, attrs }">
+                  <div v-bind="attrs" class="icon-button" v-on="on">
+                    <v-icon>mdi-translate</v-icon>
+                  </div>
+                </template>
+                <v-list>
+                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
+                    <v-list-item-title>{{ lang }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+            <div class="icon-button">
+              <v-icon>mdi-bell</v-icon>
+            </div>
+            <div class="ml-2">
+              <v-avatar>
+                <img :src="require('@/assets/patient_photo.jpg')" alt="Patient photo">
+              </v-avatar>
+            </div>
+            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido principal -->
       <v-main>
         <nuxt />
       </v-main>
@@ -150,7 +221,12 @@ export default {
           icon: 'mdi-account',
           title: 'Profile',
           to: '/profile/general'
-        },
+        }, /*
+        {
+          icon: 'mdi-help-circle',
+          title: 'Help',
+          to: '/help'
+        }, */
         {
           icon: 'mdi-logout',
           title: 'Logout',
@@ -163,6 +239,9 @@ export default {
     // Verifica si la página actual es parte de la sección `profile`
     isProfilePage () {
       return this.$route.path.startsWith('/profile')
+    },
+    isPatientDashboard () {
+      return this.$route.path.startsWith('/dashboard-after')
     }
   },
   methods: {
@@ -266,7 +345,7 @@ export default {
   position: relative;
   top: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1;
 
 }
 .app-background {
@@ -306,5 +385,8 @@ export default {
   background-color: #ffffff !important;
   border-color: #ffffff !important;
   color: #000000 !important;
+}
+patient-container {
+  background-color: #ffffff !important;
 }
 </style>

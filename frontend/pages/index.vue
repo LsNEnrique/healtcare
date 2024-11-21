@@ -50,6 +50,40 @@
       </v-container>
     </v-container>
 
+    <!-- Search bar -->
+    <v-row justify="center" class="mt-n5">
+      <!-- Adjust margin-top to peek out -->
+      <v-col cols="12" md="8" lg="6">
+        <div
+          class="search-container d-flex align-items-center elevation-2"
+          style="background-color: #FFFFFF; border-radius: 10px; padding: 10px;"
+        >
+          <v-text-field
+            prepend-inner-icon="mdi-magnify"
+            placeholder="Find doctors"
+            style="background-color: #f5f5f5; color: black; border-radius: 10px; margin-right: 10px;"
+            solo
+            flat
+            hide-details
+          />
+          <v-select
+            :items="['Location']"
+            style="background-color: #f5f5f5; color: black; border-radius: 10px; margin-right: 10px;"
+            prepend-inner-icon="mdi-crosshairs-gps"
+            solo
+            flat
+            hide-details
+          />
+          <v-btn
+            style="background-color: #3B9AB8; color: white; border-radius: 10px; white-space: nowrap;"
+            class="ml-2"
+          >
+            Search
+          </v-btn>
+        </div>
+      </v-col>
+    </v-row>
+
     <!-- Bottom container -->
     <v-container class="main-container-2">
       <v-row no-gutters class="w-100 d-flex align-center justify-space-between">

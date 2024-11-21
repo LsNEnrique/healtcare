@@ -61,7 +61,9 @@
 </template>
 
 <script>
+
 export default {
+  layout: 'default_doctor',
   data () {
     return {
       currentMonth: new Date().getMonth(), // Mes actual (0 = Enero)
