@@ -1,13 +1,13 @@
-Para iniciar a trabajar en los proyectos:
-cd frontend || cd backend
-npm i
-npm run lintfix
-npm run dev
-
-
-al hacer commits, asegurense de estar en carpeta raiz
-la que diga en la ruta: 
-/healthcare
-
-Comando para crear el frontend:
-npx create-nuxt-app frontend-healthcare
+Para iniciar a trabajar en los proyectos:<br>
+cd frontend || cd backend<br>
+npm i<br>
+npm run lintfix<br>
+npm run dev<br>
+<br>
+<br>
+al hacer commits, asegurense de estar en carpeta raiz<br>
+la que diga en la ruta:<br>
+/healthcare<br>
+<br>
+Comando para crear el frontend:<br>
+npx create-nuxt-app frontend-healthcare<br>
