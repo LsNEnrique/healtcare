@@ -2,7 +2,7 @@ interface Patient {
     nombre: string;
   }
   
-  class IPatient {
+export class IPatient {
     /*
       Crear un nuevo paciente
       @param {string} nombre -> Nombre del paciente

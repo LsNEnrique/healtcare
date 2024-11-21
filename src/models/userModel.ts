@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
-import admin from '../config/firebase';
+import db from '../config/firebase';
 import { IUser } from '../interfaces/userInterface';
 import { firestore } from 'firebase-admin';
 
 // Definición de la interfaz para los datos del usuario
-interface UserData {
+export interface UserData {
   email: string;
   password: string;
   nombre: string;
@@ -14,7 +14,7 @@ interface UserData {
   telefono: string;
 }
 
-class User extends IUser {
+export class User extends IUser {
   email: string;
   password: string;
   nombre: string;
@@ -55,7 +55,7 @@ class User extends IUser {
     try {
       // Encriptar la contraseña antes de guardarla
       const hash = await bcrypt.hash(password, 10);
-      const userRef = firestore.collection('users').doc(email);
+      const userRef = db.collection('users').doc(email);
 
       // Crear un nuevo usuario en la base de datos
       await userRef.set({
@@ -83,7 +83,7 @@ class User extends IUser {
   // Método estático para encontrar un usuario por su correo
   static async findByEmail(email: string): Promise<User | null> {
     try {
-      const userRef = firestore.collection('users').doc(email);
+      const userRef = db.collection('users').doc(email);
       const userDoc = await userRef.get();
 
       if (userDoc.exists) {
@@ -110,7 +110,7 @@ class User extends IUser {
   // Método estático para obtener todos los usuarios
   static async getAllUsers(): Promise<UserData[]> {
     try {
-      const usersSnapshot = await firestore.collection('users').get();
+      const usersSnapshot = await db.collection('users').get();
       const foundUsers: UserData[] = [];
 
       usersSnapshot.forEach((doc) => {
@@ -129,7 +129,7 @@ class User extends IUser {
   // Método estático para eliminar un usuario
   static async deleteUser(userEmail: string): Promise<void> {
     try {
-      await firestore.collection('users').doc(userEmail).delete();
+      await db.collection('users').doc(userEmail).delete();
     } catch (error) {
       throw error;
     }
@@ -141,8 +141,8 @@ class User extends IUser {
     userData: Partial<UserData>
   ): Promise<{ userUpdated: UserData | undefined }> {
     try {
-      await firestore.collection('users').doc(userEmail).update(userData);
-      const userUpdatedDoc = await firestore.collection('users').doc(userEmail).get();
+      await db.collection('users').doc(userEmail).update(userData);
+      const userUpdatedDoc = await db.collection('users').doc(userEmail).get();
       return {
         userUpdated: userUpdatedDoc.data() as UserData
       };
@@ -151,5 +151,3 @@ class User extends IUser {
     }
   }
 }
-
-export default User;

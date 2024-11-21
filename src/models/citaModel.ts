@@ -1,4 +1,4 @@
-import admin from '../config/firebase';
+import db from '../config/firebase';
 import  { ICita }  from '../interfaces/citaInterface';
 import { firestore } from 'firebase-admin';
 
@@ -8,7 +8,7 @@ interface Cita {
   fecha: string;
 }
 
-class Citas extends ICita {
+export class Citas extends ICita {
   pacienteId: string;
   doctorId: string;
   fecha: string;
@@ -21,11 +21,11 @@ class Citas extends ICita {
   }
 
   static async createCita(pacienteId: string, doctorId: string, fecha: string): Promise<Citas> {
-    const counterRef = firestore.collection('counters').doc('citas');
+    const counterRef = db.collection('counters').doc('citas');
     let newId: number;
 
     try {
-      await firestore.runTransaction(async (transaction) => {
+      await db.runTransaction(async (transaction) => {
         const counterDoc = await transaction.get(counterRef);
         if (!counterDoc.exists) {
           throw new Error('Counter document does not exist!');
@@ -39,7 +39,7 @@ class Citas extends ICita {
         transaction.update(counterRef, { lastId: newId });
       });
 
-      const citaRef = firestore.collection('citas').doc(newId.toString());
+      const citaRef = db.collection('citas').doc(newId.toString());
       await citaRef.set({
         pacienteId,
         doctorId,
@@ -56,14 +56,14 @@ class Citas extends ICita {
   static async isCitaDisponible(pacienteId: string, doctorId: string, fecha: string): Promise<boolean> {
     try {
       // Verificar citas del doctor
-      const citasDoctorEncontradas = await firestore
+      const citasDoctorEncontradas = await db
         .collection('citas')
         .where('doctorId', '==', doctorId)
         .where('fecha', '==', fecha)
         .get();
 
       // Verificar citas del paciente
-      const citasPacienteEncontradas = await firestore
+      const citasPacienteEncontradas = await db
         .collection('citas')
         .where('pacienteId', '==', pacienteId)
         .where('fecha', '==', fecha)
@@ -81,7 +81,7 @@ class Citas extends ICita {
 
   static async getDoctorCitas(doctorId: string): Promise<any[]> {
     try {
-      const citasSnapshot = await firestore
+      const citasSnapshot = await db
         .collection('citas')
         .where('doctorId', '==', doctorId)
         .get();
@@ -99,7 +99,7 @@ class Citas extends ICita {
 
   static async getCitasByPaciente(doctorId: string, pacienteId: string): Promise<any[]> {
     try {
-      const citasSnapshot = await firestore
+      const citasSnapshot = await db
         .collection('citas')
         .where('doctorId', '==', doctorId)
         .where('pacienteId', '==', pacienteId)
@@ -116,5 +116,3 @@ class Citas extends ICita {
     }
   }
 }
-
-export default Citas;

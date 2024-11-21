@@ -1,9 +1,9 @@
-import admin from '../config/firebase';
+import db from '../config/firebase';
 import { IPatient } from '../interfaces/patientInterface';
 import { firestore } from 'firebase-admin';
 
 // Definición de la interfaz para los datos del paciente
-interface PatientData {
+export interface PatientData {
   nombre: string;
   edad: number;
   sexo: string;
@@ -12,7 +12,7 @@ interface PatientData {
   direccion: string;
 }
 
-class Patient extends IPatient {
+export class Patient extends IPatient {
   nombre: string;
   edad: number;
   sexo: string;
@@ -46,7 +46,7 @@ class Patient extends IPatient {
     direccion: string
   ): Promise<Patient> {
     try {
-      const patientRef = firestore.collection('patients').doc(nombre);
+      const patientRef = db.collection('patients').doc(nombre);
       await patientRef.set({
         nombre,
         edad,
@@ -65,7 +65,7 @@ class Patient extends IPatient {
 
   static async findByName(nombre: string): Promise<Patient | null> {
     try {
-      const patientRef = firestore.collection('patients').doc(nombre);
+      const patientRef = db.collection('patients').doc(nombre);
       const patientDoc = await patientRef.get();
 
       if (patientDoc.exists) {
@@ -83,7 +83,7 @@ class Patient extends IPatient {
 
   static async getAllPatients(): Promise<any[]> {
     try {
-      const patientsSnapshot = await firestore.collection('patients').get();
+      const patientsSnapshot = await db.collection('patients').get();
       const foundPatients: any[] = [];
 
       for (const doc of patientsSnapshot.docs) {
@@ -93,7 +93,7 @@ class Patient extends IPatient {
         };
 
         // Obtener las consultas del paciente
-        const consultasSnapshot = await firestore.collection('patients').doc(doc.id).collection('consultas').get();
+        const consultasSnapshot = await db.collection('patients').doc(doc.id).collection('consultas').get();
         const foundConsultas: any[] = [];
 
         consultasSnapshot.forEach((consultasDoc) => {
@@ -114,7 +114,7 @@ class Patient extends IPatient {
 
   static async deletePatient(patientNombre: string): Promise<void> {
     try {
-      await firestore.collection('patients').doc(patientNombre).delete();
+      await db.collection('patients').doc(patientNombre).delete();
     } catch (error) {
       throw error;
     }
@@ -122,9 +122,9 @@ class Patient extends IPatient {
 
   static async updatePatient(patientNombre: string, patientData: Partial<PatientData>): Promise<any> {
     try {
-      await firestore.collection('patients').doc(patientNombre).update(patientData);
+      await db.collection('patients').doc(patientNombre).update(patientData);
 
-      const patientUpdated = await firestore.collection('patients').doc(patientNombre).get();
+      const patientUpdated = await db.collection('patients').doc(patientNombre).get();
       return {
         patientUpdated: patientUpdated.data()
       };

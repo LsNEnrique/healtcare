@@ -4,7 +4,7 @@ interface Cita {
     fecha: string;
   }
   
-  class ICita {
+export class ICita {
     /*
       Verificar si una cita está disponible
       @param {string} doctorId -> ID del doctor
@@ -51,4 +51,3 @@ interface Cita {
     }
   }
   
-  export default ICita;
