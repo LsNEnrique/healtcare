@@ -115,7 +115,7 @@ export default {
     return {
       images: [],
       locationEnabled: false,
-      focus: new Date().toISOString().substr(0, 10)
+      focus: new Date().toISOString().slice(0, 10)
     }
   },
   head () {
@@ -151,12 +151,12 @@ export default {
     prevMonth () {
       const date = new Date(this.focus)
       date.setMonth(date.getMonth() - 1)
-      this.focus = date.toISOString().substr(0, 10)
+      this.focus = date.toISOString().slice(0, 10)
     },
     nextMonth () {
       const date = new Date(this.focus)
       date.setMonth(date.getMonth() + 1)
-      this.focus = date.toISOString().substr(0, 10)
+      this.focus = date.toISOString().slice(0, 10)
     }
   }
 }
