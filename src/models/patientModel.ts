@@ -1,8 +1,6 @@
 import db from '../config/firebase';
 import { IPatient } from '../interfaces/patientInterface';
-import { firestore } from 'firebase-admin';
 
-// Definición de la interfaz para los datos del paciente
 export interface PatientData {
   nombre: string;
   edad: number;
@@ -12,7 +10,7 @@ export interface PatientData {
   direccion: string;
 }
 
-export class Patient extends IPatient {
+export class Patient implements IPatient {
   nombre: string;
   edad: number;
   sexo: string;
@@ -28,7 +26,6 @@ export class Patient extends IPatient {
     email: string,
     direccion: string
   ) {
-    super();
     this.nombre = nombre;
     this.edad = edad;
     this.sexo = sexo;
@@ -37,6 +34,16 @@ export class Patient extends IPatient {
     this.direccion = direccion;
   }
 
+  /**
+   * Crear un nuevo paciente en la base de datos.
+   * @param nombre Nombre del paciente.
+   * @param edad Edad del paciente.
+   * @param sexo Sexo del paciente.
+   * @param telefono Teléfono del paciente.
+   * @param email Email del paciente.
+   * @param direccion Dirección del paciente.
+   * @returns Instancia del paciente creado.
+   */
   static async createPatient(
     nombre: string,
     edad: number,
@@ -53,83 +60,110 @@ export class Patient extends IPatient {
         sexo,
         telefono,
         email,
-        direccion
+        direccion,
       });
 
       return new Patient(nombre, edad, sexo, telefono, email, direccion);
     } catch (error) {
-      console.log('Error => ', error);
+      console.error('Error creating patient:', error);
       throw new Error('Error creating patient');
     }
   }
 
+  /**
+   * Buscar un paciente por nombre en la base de datos.
+   * @param nombre Nombre del paciente.
+   * @returns Instancia del paciente encontrado o `null` si no existe.
+   */
   static async findByName(nombre: string): Promise<Patient | null> {
     try {
       const patientRef = db.collection('patients').doc(nombre);
       const patientDoc = await patientRef.get();
 
       if (patientDoc.exists) {
-        const patientData = patientDoc.data();
-        if (patientData) {
-          return new Patient(patientData.nombre, patientData.edad, patientData.sexo, patientData.telefono, patientData.email, patientData.direccion);
-        }
+        const patientData = patientDoc.data() as PatientData;
+        return new Patient(
+          patientData.nombre,
+          patientData.edad,
+          patientData.sexo,
+          patientData.telefono,
+          patientData.email,
+          patientData.direccion
+        );
       }
       return null;
     } catch (error) {
-      console.log('Error => ', error);
+      console.error('Error finding patient:', error);
       throw new Error('Error finding patient');
     }
   }
 
-  static async getAllPatients(): Promise<any[]> {
+  /**
+   * Obtener todos los pacientes de la base de datos, incluyendo sus consultas.
+   * @returns Lista de pacientes con sus respectivas consultas.
+   */
+  static async getAllPatients(): Promise<PatientData[]> {
     try {
       const patientsSnapshot = await db.collection('patients').get();
-      const foundPatients: any[] = [];
+      const foundPatients: PatientData[] = [];
 
       for (const doc of patientsSnapshot.docs) {
-        const patientData = {
-          id: doc.id,
-          ...doc.data()
-        };
+        const patientData = doc.data() as PatientData;
+        const consultasSnapshot = await db
+          .collection('patients')
+          .doc(doc.id)
+          .collection('consultas')
+          .get();
 
-        // Obtener las consultas del paciente
-        const consultasSnapshot = await db.collection('patients').doc(doc.id).collection('consultas').get();
-        const foundConsultas: any[] = [];
+        const consultas = consultasSnapshot.docs.map((consultaDoc) => ({
+          id: consultaDoc.id,
+          ...consultaDoc.data(),
+        }));
 
-        consultasSnapshot.forEach((consultasDoc) => {
-          foundConsultas.push({
-            id: consultasDoc.id,
-            ...consultasDoc.data()
-          });
+        foundPatients.push({
+          ...patientData,
+          ...consultas,
         });
-
-        patientData.consultas = foundConsultas;
-        foundPatients.push(patientData);
       }
       return foundPatients;
     } catch (error) {
-      throw error;
+      console.error('Error getting all patients:', error);
+      throw new Error('Error getting all patients');
     }
   }
 
-  static async deletePatient(patientNombre: string): Promise<void> {
+  /**
+   * Eliminar un paciente de la base de datos.
+   * @param nombre Nombre del paciente.
+   */
+  static async deletePatient(nombre: string): Promise<void> {
     try {
-      await db.collection('patients').doc(patientNombre).delete();
+      await db.collection('patients').doc(nombre).delete();
     } catch (error) {
-      throw error;
+      console.error('Error deleting patient:', error);
+      throw new Error('Error deleting patient');
     }
   }
 
-  static async updatePatient(patientNombre: string, patientData: Partial<PatientData>): Promise<any> {
+  /**
+   * Actualizar los datos de un paciente en la base de datos.
+   * @param nombre Nombre del paciente.
+   * @param patientData Datos a actualizar.
+   * @returns Datos actualizados del paciente.
+   */
+  static async updatePatient(
+    nombre: string,
+    patientData: Partial<PatientData>
+  ): Promise<PatientData | null> {
     try {
-      await db.collection('patients').doc(patientNombre).update(patientData);
+      const patientRef = db.collection('patients').doc(nombre);
+      await patientRef.update(patientData);
 
-      const patientUpdated = await db.collection('patients').doc(patientNombre).get();
-      return {
-        patientUpdated: patientUpdated.data()
-      };
+      const updatedDoc = await patientRef.get();
+      return updatedDoc.exists ? (updatedDoc.data() as PatientData) : null;
     } catch (error) {
-      throw error;
+      console.error('Error updating patient:', error);
+      throw new Error('Error updating patient');
     }
   }
 }

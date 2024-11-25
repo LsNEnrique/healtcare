@@ -5,11 +5,11 @@ import { User } from '../models/userModel';
 interface UserBody {
   email: string;
   password: string;
-  nombre?: string;
-  apaterno?: string;
-  amaterno?: string;
-  direccion?: string;
-  telefono?: string;
+  nombre: string;
+  apaterno: string;
+  amaterno: string;
+  direccion: string;
+  telefono: string;
 }
 
 const loginUser = async (req: Request, res: Response) => {

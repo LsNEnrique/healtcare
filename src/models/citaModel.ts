@@ -1,6 +1,5 @@
 import db from '../config/firebase';
-import  { ICita }  from '../interfaces/citaInterface';
-import { firestore } from 'firebase-admin';
+import { ICita } from '../interfaces/citaInterface';
 
 interface Cita {
   pacienteId: string;
@@ -8,13 +7,12 @@ interface Cita {
   fecha: string;
 }
 
-export class Citas extends ICita {
+export class Citas implements ICita {
   pacienteId: string;
   doctorId: string;
   fecha: string;
 
   constructor(pacienteId: string, doctorId: string, fecha: string) {
-    super();
     this.pacienteId = pacienteId;
     this.doctorId = doctorId;
     this.fecha = fecha;
@@ -48,7 +46,7 @@ export class Citas extends ICita {
 
       return new Citas(pacienteId, doctorId, fecha);
     } catch (error) {
-      console.log('Error => ', error);
+      console.error('Error creating cita =>', error);
       throw new Error('Error creating cita');
     }
   }
@@ -74,30 +72,28 @@ export class Citas extends ICita {
 
       return isDoctorAvailable && isPacienteAvailable;
     } catch (error) {
-      console.log(error);
+      console.error('Error checking cita availability =>', error);
       throw error;
     }
   }
 
-  static async getDoctorCitas(doctorId: string): Promise<any[]> {
+  static async getDoctorCitas(doctorId: string): Promise<Cita[]> {
     try {
-      const citasSnapshot = await db
-        .collection('citas')
-        .where('doctorId', '==', doctorId)
-        .get();
+      const citasSnapshot = await db.collection('citas').where('doctorId', '==', doctorId).get();
+      const citas: Cita[] = [];
 
-      const citas: any[] = [];
       citasSnapshot.forEach((doc) => {
-        citas.push({ id: doc.id, ...doc.data() });
+        citas.push({ id: doc.id, ...doc.data() } as unknown as Cita);
       });
 
       return citas;
     } catch (error) {
+      console.error('Error fetching doctor citas =>', error);
       throw error;
     }
   }
 
-  static async getCitasByPaciente(doctorId: string, pacienteId: string): Promise<any[]> {
+  static async getCitasByPaciente(doctorId: string, pacienteId: string): Promise<Cita[]> {
     try {
       const citasSnapshot = await db
         .collection('citas')
@@ -105,14 +101,18 @@ export class Citas extends ICita {
         .where('pacienteId', '==', pacienteId)
         .get();
 
-      const citas: any[] = [];
+      const citas: Cita[] = [];
       citasSnapshot.forEach((doc) => {
-        citas.push({ id: doc.id, ...doc.data() });
+        citas.push({ id: doc.id, ...doc.data() } as unknown as Cita);
       });
 
       return citas;
     } catch (error) {
+      console.error('Error fetching citas by paciente =>', error);
       throw error;
     }
   }
 }
+
+export default Citas;
+
