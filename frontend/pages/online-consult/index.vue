@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-6 rounded elevation-2">
+  <v-container class="pa-6 rounded elevation-2 mt-2">
     <!-- Título -->
     <h2 class="text-h5 font-weight-bold mb-3">
       Consultation Info
@@ -123,5 +123,4 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos opcionales */
 </style>

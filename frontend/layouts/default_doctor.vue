@@ -1,6 +1,5 @@
 <template>
   <v-app color="white">
-    <!-- Sidebar fijo sin fondo negro -->
     <v-navigation-drawer
       app
       elevation="1"
@@ -8,8 +7,8 @@
       :mini-variant="miniVariant"
       :right="right"
     >
+      <!-- Sidebar -->
       <v-list>
-        <!-- Logo and Text -->
         <v-list-item class="logo-container">
           <v-icon color="#3B9AB8" class="mr-2">
             mdi-medication
@@ -19,7 +18,6 @@
           </v-list-item-title>
         </v-list-item>
 
-        <!-- Sidebar Items -->
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
@@ -32,299 +30,175 @@
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>
-              {{ item.title }}
-            </v-list-item-title>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item class="bottom-container">
-          <div class="background-image-container">
-            <v-img :src="require('@/assets/default-gopro.png')" alt="Dashboard Image" contain />
-          </div>
-          <div class="bottom-content">
-            <v-list-item-title class="bottom-text">
-              <br>Get faster<br>and better<br>Healthcare
-            </v-list-item-title>
-            <v-btn class="gopro-btn" text @click="$router.push('/gopro')">
-              Go Pro
-            </v-btn>
-          </div>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
-    <!-- Patient Records -->
     <div class="app-background">
-      <!-- Div que se muestra solo en la vista de perfil -->
-      <div v-if="isPatientPage" class="header-container">
-        <!-- Encabezado personalizado -->
-        <div class="app-bar">
-          <div class="d-flex flex-column">
-            <div class="text-h6 font-weight-bold">
-              Hi, {{ patientName }}
-            </div>
-            <div class="text-h4 font-weight-bold">
-              Patient Records
-            </div>
-          </div>
-          <div class="d-flex">
-            <div class="menu-wrapper">
-              <v-menu offset-y>
-                <template #activator="{ on, attrs }">
-                  <div v-bind="attrs" class="icon-button" v-on="on">
-                    <v-icon>mdi-translate</v-icon>
-                  </div>
-                </template>
-                <v-list>
-                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
-                    <v-list-item-title>{{ lang }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div>
-            <div class="icon-button">
-              <v-icon>mdi-bell</v-icon>
-            </div>
-            <div class="ml-2">
-              <v-avatar>
-                <img :src="patientPhoto" alt="Patient photo">
-              </v-avatar>
-            </div>
-            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
-          </div>
-        </div>
-        <div class="navigation-buttons mt-1 mb-2 pt-3">
-          <nuxt-link to="/patient-records/yesterday">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'yesterday' }" outlined @click="selectButton('yesterday')">
-                Yesterday
-              </v-btn>
-            </div>
-          </nuxt-link>
-          <nuxt-link to="/patient-records/today">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'today' }" outlined @click="selectButton('today')">
-                Today
-              </v-btn>
-            </div>
-          </nuxt-link>
-          <nuxt-link to="/patient-records/past">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'past' }" outlined @click="selectButton('past')">
-                Past
-              </v-btn>
-            </div>
-          </nuxt-link>
-        </div>
+      <!-- Encabezado -->
+      <HeaderBar
+        v-if="showHeader"
+        :title="headerTitle"
+        :patient-name="patientName"
+        :patient-photo="patientPhoto"
+        :languages="languages"
+        @change-language="changeLanguage"
+      />
+
+      <!-- Botones de navegación de My-Consults -->
+      <NavigationButtons
+        v-if="showNavigationButtonsConsults"
+        :buttons="navigationButtonsConsults"
+        :selected-button="selectedButton"
+        @select-button="selectButton"
+      />
+
+      <!-- Nuevos botones -->
+      <div v-if="showNavigationButtonsConsults" class="button-container">
+        <!-- Botón de nueva cita -->
+        <v-btn
+          color="blue"
+          @click="showModal=true"
+        >
+          + New Appointment
+        </v-btn>
       </div>
+
+      <!-- Botones de navegación de Patient-Records -->
+      <NavigationButtons
+        v-if="showNavigationButtonsPatient"
+        :buttons="navigationButtonsPatient"
+        :selected-button="selectedButton"
+        @select-button="selectButton"
+      />
 
       <!-- Contenido principal -->
       <v-main>
         <nuxt />
       </v-main>
-    </div>
 
-    <!-- My Availabity -->
-    <div class="app-background">
-      <!-- Div que se muestra solo en la vista de perfil -->
-      <div v-if="isAvailabityPage" class="header-container">
-        <!-- Encabezado personalizado -->
-        <div class="app-bar">
-          <div class="d-flex flex-column">
-            <div class="text-h6 font-weight-bold">
-              Hi, {{ patientName }}
-            </div>
-            <div class="text-h4 font-weight-bold">
-              My Availabity
-            </div>
-          </div>
-          <div class="d-flex">
-            <div class="menu-wrapper">
-              <v-menu offset-y>
-                <template #activator="{ on, attrs }">
-                  <div v-bind="attrs" class="icon-button" v-on="on">
-                    <v-icon>mdi-translate</v-icon>
+      <!-- Modal Appointment -->
+      <v-dialog v-model="showModal" max-width="1200px">
+        <v-card style="height: 600px;">
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <!-- Left part of the modal -->
+                <v-col cols="6">
+                  <v-btn icon class="close-btn" @click="closeModal">
+                    <v-icon>mdi-arrow-left</v-icon>
+                  </v-btn>
+                  <div class="doctor-info">
+                    <v-icon>mdi-doctor</v-icon> {{ doctor_name }}
                   </div>
-                </template>
-                <v-list>
-                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
-                    <v-list-item-title>{{ lang }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div>
-            <div class="icon-button">
-              <v-icon>mdi-bell</v-icon>
-            </div>
-            <div class="ml-2">
-              <v-avatar>
-                <img :src="patientPhoto" alt="Patient photo">
-              </v-avatar>
-            </div>
-            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contenido principal -->
-      <v-main>
-        <nuxt />
-      </v-main>
-    </div>
-
-    <!-- My Consults -->
-    <div class="app-background">
-      <!-- Div que se muestra solo en la vista de perfil -->
-      <div v-if="isConsultsPage" class="header-container">
-        <!-- Encabezado personalizado -->
-        <div class="app-bar">
-          <div class="d-flex flex-column">
-            <div class="text-h6 font-weight-bold">
-              Hi, {{ patientName }}
-            </div>
-            <div class="text-h4 font-weight-bold">
-              Booking
-            </div>
-          </div>
-          <div class="d-flex">
-            <div class="menu-wrapper">
-              <v-menu offset-y>
-                <template #activator="{ on, attrs }">
-                  <div v-bind="attrs" class="icon-button" v-on="on">
-                    <v-icon>mdi-translate</v-icon>
+                  <div class="duration-info">
+                    <v-icon>mdi-clock-outline</v-icon> {{ duration_time_minutes }}
                   </div>
-                </template>
-                <v-list>
-                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
-                    <v-list-item-title>{{ lang }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div>
-            <div class="icon-button">
-              <v-icon>mdi-bell</v-icon>
-            </div>
-            <div class="ml-2">
-              <v-avatar>
-                <img :src="patientPhoto" alt="Patient photo">
-              </v-avatar>
-            </div>
-            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
-          </div>
-        </div>
-        <div class="navigation-buttons mt-1 mb-2 pt-3">
-          <nuxt-link to="/my-consults/upcoming">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'upcoming' }" outlined @click="selectButton('upcoming')">
-                Upcoming
-              </v-btn>
-            </div>
-          </nuxt-link>
-          <nuxt-link to="/my-consults/past">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'past' }" outlined @click="selectButton('past')">
-                Past
-              </v-btn>
-            </div>
-          </nuxt-link>
-          <nuxt-link to="/my-consults/cancelled">
-            <div class="button-row">
-              <v-btn class="nav-btn mr-5" :class="{ 'selected-btn': selectedButton === 'cancelled' }" outlined @click="selectButton('cancelled')">
-                Cancelled
-              </v-btn>
-            </div>
-          </nuxt-link>
-
-          <div class="month-year-select">
-            <select v-model="selectedMonthYear" @change="onMonthYearChange">
-              <option value="" disabled selected>
-                Select Month & Year
-              </option>
-              <!-- Mostrar meses con su respectivo año -->
-              <option v-for="(month, index) in months" :key="index" :value="`${month} ${selectedYear}`">
-                {{ month }} {{ selectedYear }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Botón para crear nueva cita -->
-          <button class="new-appointment-btn" @click="createNewAppointment">
-            + New Appointment
-          </button>
-        </div>
-      </div>
-
-      <!-- Contenido principal -->
-      <v-main>
-        <nuxt />
-      </v-main>
-    </div>
-
-    <!-- Online consult -->
-    <div class="app-background">
-      <!-- Div que se muestra solo en la vista de perfil -->
-      <div v-if="isOnlinePage" class="header-container">
-        <!-- Encabezado personalizado -->
-        <div class="app-bar">
-          <div class="d-flex flex-column">
-            <div class="text-h6 font-weight-bold">
-              Hi, {{ patientName }}
-            </div>
-            <div class="text-h4 font-weight-bold">
-              Online Consult
-            </div>
-          </div>
-          <div class="d-flex">
-            <div class="menu-wrapper">
-              <v-menu offset-y>
-                <template #activator="{ on, attrs }">
-                  <div v-bind="attrs" class="icon-button" v-on="on">
-                    <v-icon>mdi-translate</v-icon>
+                  <div class="video-info">
+                    <v-icon>mdi-video-outline</v-icon> Video call details provided upon successful confirmation
                   </div>
-                </template>
-                <v-list>
-                  <v-list-item v-for="(lang, index) in languages" :key="index" @click="changeLanguage(lang)">
-                    <v-list-item-title>{{ lang }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div>
-            <div class="icon-button">
-              <v-icon>mdi-bell</v-icon>
-            </div>
-            <div class="ml-2">
-              <v-avatar>
-                <img :src="patientPhoto" alt="Patient photo">
-              </v-avatar>
-            </div>
-            <span class="ml-2 font-weight-bold">{{ patientName }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contenido principal -->
-      <v-main>
-        <nuxt />
-      </v-main>
+                  <div class="fee-info">
+                    <v-icon>mdi-cash</v-icon> Fee: {{ fee_amount }}
+                  </div>
+                </v-col>
+                <!-- Right part of the modal for calendar -->
+                <v-col cols="6">
+                  <!-- first part-->
+                  <div v-if="modalStep === 1">
+                    <div class="d-flex justify-space-between align-items-center mb-2">
+                      <v-btn @click="prevMonth">
+                        &lt;
+                      </v-btn>
+                      <v-btn disabled>
+                        {{ displayMonth }}
+                      </v-btn>
+                      <v-btn @click="nextMonth">
+                        &gt;
+                      </v-btn>
+                    </div>
+                    <v-calendar
+                      ref="calendar"
+                      v-model="focus"
+                      color="f5f5f5"
+                      show-month
+                      @click:more="viewDay"
+                    />
+                    <div class="date-info">
+                      {{ displayDate }}
+                    </div>
+                    <!-- 5 cols 2 rows of buttons-->
+                    <v-row>
+                      <v-col v-for="n in 10" :key="n" cols="2">
+                        <v-btn :color="selectedTime === `${n}` ? 'blue' : 'grey'">
+                          12:00
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-btn class="mt-4" color="#1976D2" dark @click="nextStep">
+                      Next
+                    </v-btn>
+                  </div>
+                  <div v-else>
+                    <v-form>
+                      <v-text-field label="Patient's Email" outlined />
+                      <v-row>
+                        <v-col cols="4">
+                          <v-select
+                            :items="extensions"
+                            label="Extension"
+                            item-text="text"
+                            item-value="value"
+                            outlined
+                            class="extension-select"
+                          />
+                        </v-col>
+                        <v-col cols="8">
+                          <v-text-field label="Phone number" outlined maxlength="10" />
+                        </v-col>
+                      </v-row>
+                      <v-select v-model="selectedProblem" :items="problems" outlined label="Problem" />
+                      <h3>Payment Details</h3>
+                      <v-radio-group v-model="paymentMethod">
+                        <v-radio label="PayPal" value="paypal" />
+                        <v-radio label="Paytm" value="paytm" />
+                        <v-radio label="Credit Card" value="credit-card" />
+                      </v-radio-group> <v-btn color="#1976D2" dark @click="confirmAppointment">
+                        Confirm
+                      </v-btn>
+                    </v-form>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
   </v-app>
 </template>
 
 <script>
+import HeaderBar from '@/components/HeaderBar.vue'
+import NavigationButtons from '@/components/NavigationButtons.vue'
+
 export default {
-  name: 'DefaultLayoutDoctor',
+  components: { HeaderBar, NavigationButtons },
   data () {
     return {
       patientName: 'John Doe',
       patientPhoto: 'https://example.com/path/to/photo.jpg',
       languages: ['English', 'Spanish', 'French'],
-      selectedButton: 'null',
+      selectedButton: null,
       miniVariant: false,
       right: false,
-      selectedMonth: null,
-      selectedYear: 2024,
-      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      menuVisible: false,
+      selectedMonth: 'May\'24',
+      months: [
+        'Jan\'24', 'Feb\'24', 'Mar\'24', 'Apr\'24', 'May\'24', 'Jun\'24',
+        'Jul\'24', 'Aug\'24', 'Sep\'24', 'Oct\'24', 'Nov\'24', 'Dec\'24'
+      ],
       items: [
         {
           icon: 'mdi-view-dashboard',
@@ -334,7 +208,7 @@ export default {
         {
           icon: 'mdi-file-document-multiple-outline',
           title: 'Patient Records',
-          to: '/patient-records'
+          to: '/patient-records/yesterday'
         },
         {
           icon: 'mdi-calendar',
@@ -344,7 +218,7 @@ export default {
         {
           icon: 'mdi-account',
           title: 'My Consults',
-          to: '/my-consults'
+          to: '/my-consults/upcoming'
         },
         {
           icon: 'mdi-video-outline',
@@ -356,193 +230,197 @@ export default {
           title: 'Logout',
           to: '/'
         }
-      ]
+      ],
+      extensions: [
+        { text: '🇺🇸 +1', value: '+1' },
+        { text: '🇲🇽 +52', value: '+52' }
+      ],
+      showModal: false,
+      modalStep: 1,
+      doctor_name: 'Dr. John Doe',
+      duration_time_minutes: '30 mins',
+      fee_amount: '$50',
+      focus: new Date().toISOString().slice(0, 10),
+      displayDate: '',
+      selectedTime: null,
+      patientEmail: '',
+      contactNumber: '',
+      selectedProblem: '',
+      problems: ['Fever', 'Cough', 'Headache', 'Stomachache', 'Other'],
+      paymentMethod: ''
     }
   },
   computed: {
-    isPatientPage () {
-      return this.$route.path.startsWith('/patient-records')
+    displayMonth () {
+      const date = new Date(this.focus)
+      const options = { month: 'long', year: 'numeric' }
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.displayDate = date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+      // this.displayDate = date.toLocaleDateString(undefined, options)
+      return date.toLocaleDateString(undefined, options)
     },
-    isAvailabityPage () {
-      return this.$route.path.startsWith('/my-availabity')
+    showHeader () {
+      return [
+        '/patient-records',
+        '/my-availabity',
+        '/my-consults',
+        '/online-consult'].some(path =>
+        this.$route.path.startsWith(path)
+      )
     },
-    isConsultsPage () {
+    headerTitle () {
+      if (this.$route.path.startsWith('/patient-records')) {
+        return 'Patient Records'
+      }
+      if (this.$route.path.startsWith('/my-availabity')) {
+        return 'My Availabity'
+      }
+      if (this.$route.path.startsWith('/my-consults')) {
+        return 'Booking'
+      }
+      if (this.$route.path.startsWith('/online-consult')) {
+        return 'Online Consult'
+      }
+      return ''
+    },
+    showNavigationButtonsConsults () {
       return this.$route.path.startsWith('/my-consults')
     },
-    isOnlinePage () {
-      return this.$route.path.startsWith('/online-consult')
+    showNavigationButtonsPatient () {
+      return this.$route.path.startsWith('/patient-records')
+    },
+    navigationButtonsConsults () {
+      return [
+        {
+          name: 'upcoming',
+          label: 'Upcoming',
+          to: '/my-consults/upcoming'
+        },
+        {
+          name: 'past',
+          label: 'Past',
+          to: '/my-consults/past'
+        },
+        {
+          name: 'cancelled',
+          label: 'Cancelled',
+          to: '/my-consults/cancelled'
+        }
+      ]
+    },
+    navigationButtonsPatient () {
+      return [
+        {
+          name: 'yesterday',
+          label: 'Yesterday',
+          to: '/patient-records/yesterday'
+        },
+        {
+          name: 'today',
+          label: 'Today',
+          to: '/patient-records/today'
+        },
+        {
+          name: 'Past',
+          label: 'Past',
+          to: '/patient-records/past'
+        }
+      ]
     }
   },
   methods: {
+    viewDay ({ date }) {
+      this.focus = date
+    },
+    prevMonth () {
+      const date = new Date(this.focus)
+      date.setMonth(date.getMonth() - 1)
+      this.focus = date.toISOString().slice(0, 10)
+    },
+    nextMonth () {
+      const date = new Date(this.focus)
+      date.setMonth(date.getMonth() + 1)
+      this.focus = date.toISOString().slice(0, 10)
+    },
     changeLanguage (lang) {
     },
     selectButton (button) {
       this.selectedButton = button
     },
-    selectMonthYear () {
+    closeModal () {
+      if (this.modalStep !== 1) {
+        this.modalStep = 1
+      } else {
+        this.showModal = false
+      }
     },
-    createNewAppointment () {
+    nextStep () {
+      this.modalStep = 2
+    },
+    confirmAppointment () {
+      // logic to insert appointment
+      this.modalStep = 1
+      this.showModal = false
     }
   }
 }
 </script>
 
-  <style scoped>
-  .sidebar-item {
-    background-color: white;
-  }
-
-  .selected-item {
-    background-color: #3B9AB8 !important;
-  }
-
-  .v-list-item-icon {
-    margin-right: 8px;
-    color: black;
-  }
-
-  .v-list-item-title {
-    margin-left: 0;
-    color: black;
-  }
-
+<style scoped>
   .logo-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 32px;
-    margin-top: 20px;
-    margin-left: 32px;
-  }
-
-  .bottom-container {
-    position: absolute;
-    bottom: -50px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: bottom;
-    justify-content: bottom;
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  .background-image-container {
-    position: relative;
-    left: 0;
-    bottom:-20px;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    z-index: 0;
-  }
-
-  .bottom-content {
-    position: relative;
-    z-index: 3;
-    text-align: center;
-    background-color: black;
-    bottom: 0;
-    width: 100%;
-    border-top-left-radius: 95px; /* Rounded top left */
-    border-top-right-radius: 95px; /* Rounded top right */
-  }
-
-  .bottom-text {
-    color: white;
-    font-weight: bold;
-    font-size: 24px;
-    margin-bottom: 10px; /* Space between text and button */
-  }
-
-  .gopro-btn {
-    background-color: #3B9AB8 !important;
-    color: white !important;
-    transition: background-color 0.3s, color 0.3s;
+    padding: 1rem;
   }
 
   .logo-text {
-    color: #3B9AB8;
+    font-size: 20px;
     font-weight: bold;
-    font-size: 32px;
   }
 
-  .app-bar {
+  .sidebar-item {
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-item:hover {
+    background-color: rgba(59, 154, 184, 0.1);
+  }
+
+  .selected-item {
+    background-color: rgba(59, 154, 184, 0.2);
+    color: #3b9ab8;
+  }
+
+  .app-background {
+    background-color: #f9fbfd;
+    min-height: 100vh;
+  }
+
+  .button-container {
     display: flex;
     justify-content: space-between;
+    padding: 1rem 2rem;
     align-items: center;
-    width: 83.1%;
-    margin-left: auto;
-    padding: 16px;
+    margin-top: 1rem;
+  }
+
+  .v-btn.outlined {
     background-color: white;
-    position: relative;
-    top: 0;
-    right: 0;
-    z-index: 1000;
-
-  }
-  .app-background {
-    background-color: white;
-    min-height: 100vh;
-    padding: 0;
-    margin: 0;
+    border: 1px solid #3b9ab8;
+    color: #3b9ab8;
+    font-weight: bold;
   }
 
-  .app-main {
-    margin-top: 80px;
+  .v-btn[color="blue"] {
+    background-color: #3b9ab8;
+    color: white;
+    font-weight: bold;
   }
 
-  .icon-button {
-    cursor: pointer;
-    margin-left: 8px;
+  .v-dialog__content {
+    padding: 2rem;
   }
-
-  .navigation-buttons {
-    display: flex;
-    width: 82.3%;
-    flex-direction: row;
-    margin-left: auto;
-    align-items: flex-start;
-    background-color: white;
-  }
-
-  .button-row {
-    margin-bottom: 0; /* Elimina el margen inferior */
-  }
-
-  .nav-btn {
-    border-color: white;
-    color: black;
-  }
-  .selected-btn {
-    background-color: white !important;
-    border-color: white !important;
-    color: #f5f5f5 !important;
-  }
-
-  .month-year-select select {
-  padding: 8px 16px;
-  font-size: 16px;
-  border: 1px solid #000;
-  border-radius: 4px;
-  background-color: white;
-  color: black;
-  cursor: pointer;
-}
-
-.new-appointment-btn {
-  background-color: #1976D2;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-.new-appointment-btn:hover {
-  background-color: #1976D2;
-  color: white;
-  opacity: 0.9;
-}
-  </style>
+</style>
