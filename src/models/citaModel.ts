@@ -20,10 +20,9 @@ export class Citas implements ICita {
 
   static async createCita(pacienteId: string, doctorId: string, fecha: string): Promise<Citas> {
     const counterRef = db.collection('counters').doc('citas');
-    let newId: number;
 
     try {
-      await db.runTransaction(async (transaction) => {
+      const newId = await db.runTransaction(async (transaction) => {
         const counterDoc = await transaction.get(counterRef);
         if (!counterDoc.exists) {
           throw new Error('Counter document does not exist!');
@@ -33,8 +32,10 @@ export class Citas implements ICita {
         if (typeof lastId !== 'number') {
           throw new Error('Invalid lastId in counter document!');
         }
-        newId = lastId + 1;
-        transaction.update(counterRef, { lastId: newId });
+
+        const calculatedId = lastId + 1;
+        transaction.update(counterRef, { lastId: calculatedId });
+        return calculatedId; // Retorna el nuevo ID dentro de la transacción
       });
 
       const citaRef = db.collection('citas').doc(newId.toString());

@@ -1,0 +1,17 @@
+Un enrutador no transfiere los broadcast
+
+Una tabla de enrutamiento tiene:
+-Direcciones de red
+-Instrucciones de red
+
+POST --- ROM; No Volatil
+Bootstrap --- ROM; No Volatil
+IOS --- Flash: No volatil
+Archivo de conf (startup - config) -> NVRAM:
+Archivo de conf actual (running-config) RAM:
+
+Para acceder a la tabla de enrutamiento (en el enrutador CISCO) es:
+#show ip route
+
+Cuando se configure un router se debe de revisar la conectividad de los hosts
+
