@@ -1,77 +1,74 @@
 <template>
-  <div class="container">
-    <!-- Primera fila: Mes actual -->
-    <div class="row">
-      <h2>{{ currentMonth }}</h2>
-      <div class="rows">
-        <div
-          v-for="(item, index) in currentMonthCards"
-          :key="'current-' + index"
-          class="row-item"
-        >
-          <div class="column date">
-            <span class="day">{{ item.day }}</span>
-            <span class="weekday">{{ item.weekday }}</span>
-          </div>
-          <div class="column info">
-            <div><span class="label">Time:</span> {{ item.time }}</div>
-            <div><span class="label">Name:</span> {{ item.name }}</div>
-            <div><span class="label">Issue:</span> {{ item.issue }}</div>
-            <a href="#" class="view-documents">View Documents</a>
-          </div>
-          <div class="column actions">
-            <select v-model="item.selectedOption" @change="handleOptionChange(index, 'current')">
-              <option disabled value="">
-                Edit
-              </option>
-              <option value="edit">
-                Edit
-              </option>
-              <option value="cancel">
-                Cancel
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
+  <v-container>
+    <v-row>
+      <v-col v-for="(group, index) in groupedAppointments" :key="index" cols="12">
+        <!-- Encabezado del Mes -->
+        <v-row v-if="group.month" class="mb-2">
+          <v-col cols="12" class="month-header">
+            <strong>{{ group.month }}</strong>
+          </v-col>
+        </v-row>
 
-    <!-- Segunda fila: Próximo mes -->
-    <div class="row">
-      <h2>{{ nextMonth }}</h2>
-      <div class="rows">
-        <div
-          v-for="(item, index) in nextMonthCards"
-          :key="'next-' + index"
-          class="row-item"
-        >
-          <div class="column date">
-            <span class="day">{{ item.day }}</span>
-            <span class="weekday">{{ item.weekday }}</span>
-          </div>
-          <div class="column info">
-            <div><span class="label">Time:</span> {{ item.time }}</div>
-            <div><span class="label">Name:</span> {{ item.name }}</div>
-            <div><span class="label">Issue:</span> {{ item.issue }}</div>
-            <a href="#" class="view-documents">View Documents</a>
-          </div>
-          <div class="column actions">
-            <select v-model="item.selectedOption" @change="handleOptionChange(index, 'next')">
-              <option disabled value="">
-                Edit
-              </option>
-              <option value="edit">
-                Edit
-              </option>
-              <option value="cancel">
-                Cancel
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <!-- Tarjetas de Citas -->
+        <v-card v-for="(item, i) in group.appointments" :key="i" class="pa-0 mb-4" outlined>
+          <v-row align="center">
+            <!-- Fecha -->
+            <v-col cols="2" class="date-column text-center">
+              <div class="day">
+                {{ item.day }}
+              </div>
+              <div class="date">
+                {{ item.date }}
+              </div>
+            </v-col>
+
+            <!-- Detalles -->
+            <v-col cols="7" class="details-column">
+              <p class="mb-1 time">
+                <v-icon small left class="clock-icon">
+                  mdi-clock
+                </v-icon>
+                {{ item.time }}
+              </p>
+              <p class="mb-1 issue">
+                Issue: {{ item.issue }}
+              </p>
+              <p v-if="item.documents">
+                <a :href="item.documents" class="documents-link">View Documents</a>
+              </p>
+              <p v-else>
+                -
+              </p>
+            </v-col>
+
+            <!-- Persona -->
+            <v-col cols="2" class="person-column text-center">
+              <v-icon small class="person-icon">
+                mdi-account
+              </v-icon>
+              {{ item.person }}
+            </v-col>
+
+            <!-- Botón -->
+            <v-col cols="1" class="actions-column text-right">
+              <v-menu offset-y>
+                <template #activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-title>Edit</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -79,141 +76,93 @@ export default {
   layout: 'default_doctor',
   data () {
     return {
-      currentMonth: 'November',
-      nextMonth: 'December',
-      currentMonthCards: [
-        {
-          day: '18',
-          weekday: 'Mon',
-          time: '10:00 AM',
-          name: 'John Doe',
-          issue: 'Payment',
-          selectedOption: ''
-        },
-        {
-          day: '19',
-          weekday: 'Tue',
-          time: '11:30 AM',
-          name: 'Jane Smith',
-          issue: 'Refund',
-          selectedOption: ''
-        },
-        {
-          day: '20',
-          weekday: 'Wed',
-          time: '2:00 PM',
-          name: 'Alice Brown',
-          issue: 'Complaint',
-          selectedOption: ''
-        }
-      ],
-      nextMonthCards: [
-        {
-          day: '1',
-          weekday: 'Fri',
-          time: '9:00 AM',
-          name: 'Bob Martin',
-          issue: 'Feedback',
-          selectedOption: ''
-        },
-        {
-          day: '2',
-          weekday: 'Sat',
-          time: '3:30 PM',
-          name: 'Clara Lee',
-          issue: 'Support',
-          selectedOption: ''
-        },
-        {
-          day: '3',
-          weekday: 'Sun',
-          time: '4:15 PM',
-          name: 'Eve White',
-          issue: 'Inquiry',
-          selectedOption: ''
-        }
+      appointments: [
+        { month: "May'23", day: 'Thu', date: '15', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire' },
+        { month: "May'23", day: 'Fri', date: '16', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire' },
+        { month: "May'23", day: 'Mon', date: '19', time: '09:00am - 09:30am', issue: 'Fever', documents: null, person: 'Stephine Claire' },
+        { month: "June'23", day: 'Mon', date: '02', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire' },
+        { month: "June'23", day: 'Tue', date: '03', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire' },
+        { month: "June'23", day: 'Wed', date: '04', time: '09:00am - 09:30am', issue: 'Fever', documents: null, person: 'Stephine Claire' }
       ]
     }
   },
-  methods: {
-    handleOptionChange (index, type) {
-      if (type === 'current' && this.currentMonthCards[index].selectedOption === 'cancel') {
-        this.currentMonthCards.splice(index, 1)
-      } else if (type === 'next' && this.nextMonthCards[index].selectedOption === 'cancel') {
-        this.nextMonthCards.splice(index, 1)
-      }
+  computed: {
+    groupedAppointments () {
+      const groups = []
+      let currentMonth = null
+
+      this.appointments.forEach((appointment) => {
+        if (appointment.month !== currentMonth) {
+          currentMonth = appointment.month
+          groups.push({ month: currentMonth, appointments: [] })
+        }
+        groups[groups.length - 1].appointments.push(appointment)
+      })
+
+      return groups
     }
   }
 }
 </script>
 
-  <style>
-  .container {
-    width: 100%;
-    margin: 0 auto;
-    padding: 16px;
+<style>
+  .date-column {
+    background-color: #f9f9f9;
+    border-right: 1px solid #e0e0e0;
   }
 
-  .row {
-    margin-bottom: 32px;
-  }
-
-  .rows {
-    display: flex;
-    flex-direction: column;
-    width: 100%; /* Asegura que las filas ocupen todo el ancho disponible */
-  }
-
-  .row-item {
-    display: flex;
-    align-items: center;
-    width: 100%; /* Las filas ocupan el 100% del ancho */
-    padding: 12px 16px;
-    border-bottom: 1px solid #ddd;
-  }
-
-  .row-item:last-child {
-    border-bottom: none;
-  }
-
-  .column {
-    padding: 0 16px;
-  }
-
-  .column-info{
-    flex-direction: row;
-    background-color: white;
+  .day {
+    font-weight: bold;
+    font-size: 1rem;
   }
 
   .date {
-    flex: 0 0 100px; /* Ancho fijo para la columna de la fecha */
-    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4a4a4a;
   }
 
-  .date .day {
-    font-size: 18px;
+  .details-column {
+    padding-left: 16px;
+  }
+
+  .time {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+  }
+
+  .issue {
+    font-size: 0.9rem;
     font-weight: bold;
   }
 
-  .date .weekday {
-    font-size: 14px;
-    color: #666;
-  }
-
-  .info {
-    flex: 1;
-  }
-
-  .info .label {
-    font-weight: bold;
-  }
-
-  .actions {
-    flex: 0 0 120px; /* Ancho fijo para las acciones */
-  }
-
-  .view-documents {
+  .documents-link {
+    font-size: 0.9rem;
+    color: #1a73e8;
     text-decoration: none;
-    font-size: 14px;
   }
-  </style>
+
+  .documents-link:hover {
+    text-decoration: underline;
+  }
+
+  .person-column {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+  }
+
+  .actions-column {
+    padding-right: 16px;
+  }
+
+  .month-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #4a4a4a;
+  }
+
+  .v-card {
+    border-radius: 8px;
+  }
+</style>
