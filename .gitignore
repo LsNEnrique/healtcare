@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 node_modules
 /src/config/serviceAccountKey.json
 .env
+=======
+frontend/node_modules
+backend/node_modules
+>>>>>>> 7372bd03163bb1bd29fdaecad871da37a375d945

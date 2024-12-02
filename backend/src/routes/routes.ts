@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { registerUser, loginUser, getAllUsers, deleteUser, updateUser } from './../controller/userController';
-import { registerPatient, getAllPatients, deletePatient, updatePatient } from './../controller/patientController';
-import { crearCita, getAllDoctorCitas, getAllPatientCitas } from './../controller/citaController';
-import authenticateToken from './../auth/authMiddleware';
+import { registerUser, loginUser, getAllUsers, deleteUser, updateUser } from '../controller/userController';
+import { registerPatient, getAllPatients, deletePatient, updatePatient } from '../controller/patientController';
+import { crearCita, getAllDoctorCitas, getAllPatientCitas } from '../controller/citaController';
+import authenticateToken from '../auth/authMiddleware';
 
 const router = express.Router();
 
