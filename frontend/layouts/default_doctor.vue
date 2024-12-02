@@ -264,7 +264,10 @@ export default {
         '/patient-records',
         '/my-availabity',
         '/my-consults',
-        '/online-consult'].some(path =>
+        '/online-consult',
+        '/dashboard-doctor',
+        '/calendar',
+        '/profile'].some(path =>
         this.$route.path.startsWith(path)
       )
     },
@@ -280,6 +283,15 @@ export default {
       }
       if (this.$route.path.startsWith('/online-consult')) {
         return 'Online Consult'
+      }
+      if (this.$route.path.startsWith('/dashboard-doctor')) {
+        return 'Dashboard Doctor'
+      }
+      if (this.$route.path.startsWith('/calendar')) {
+        return 'Calendar'
+      }
+      if (this.$route.path.startsWith('/profile')) {
+        return 'Profile'
       }
       return ''
     },
@@ -370,12 +382,16 @@ export default {
   .logo-container {
     display: flex;
     align-items: center;
-    padding: 1rem;
+    justify-content: center;
+    margin-bottom: 32px;
+    margin-top: 20px;
+    margin-left: 32px;
   }
 
   .logo-text {
-    font-size: 20px;
-    font-weight: bold;
+  color: #3B9AB8;
+  font-weight: bold;
+  font-size: 32px;
   }
 
   .sidebar-item {
@@ -390,8 +406,9 @@ export default {
   }
 
   .selected-item {
-    background-color: rgba(59, 154, 184, 0.2);
-    color: #3b9ab8;
+    /* background-color: rgba(59, 154, 184, 0.2); */
+    background-color: #3B9AB8 !important;
+    color: white;
   }
 
   .app-background {

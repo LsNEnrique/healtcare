@@ -2,14 +2,12 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h2 class="today-header">
+        <h2 class="header">
           Today's Appointments
         </h2>
       </v-col>
-
-      <!-- Tarjetas de Citas del Día -->
       <v-col v-for="(appointment, index) in todayAppointments" :key="index" cols="12">
-        <v-card class="pa-0 mb-4 today" outlined>
+        <v-card class="pa-0 mb-4" outlined>
           <v-row align="center">
             <!-- Fecha -->
             <v-col cols="2" class="date-column text-center">
@@ -76,6 +74,7 @@ import axios from 'axios'
 export default {
   layout: 'default_doctor',
   data () {
+    const todayDate = new Date().toISOString().split('T')[0] // Fecha actual (YYYY-MM-DD)
     return {
       todayDate: new Date().toISOString().split('T')[0], // Fecha actual (YYYY-MM-DD)
       appointments: []
@@ -111,46 +110,63 @@ export default {
 </script>
 
 <style scoped>
-  .today {
-    background-color: #eaf4ff;
-    border-left: 4px solid #2196f3;
-  }
+.date-column {
+  background-color: #f9f9f9;
+  border-right: 1px solid #e0e0e0;
+}
 
-  .today-header {
+.day {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.date {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.details-column {
+  padding-left: 16px;
+}
+
+.time {
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
+
+.header {
     font-size: 1.4rem;
     color: #444;
     margin-bottom: 20px;
-  }
+}
 
-  .date-column .day {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #444;
-  }
+.issue {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
 
-  .date-column .date {
-    font-size: 1.4rem;
-    color: #333;
-  }
+.documents-link {
+  font-size: 0.9rem;
+  color: #1a73e8;
+  text-decoration: none;
+}
 
-  .details-column .time {
-    font-size: 0.9rem;
-    color: #555;
-  }
+.documents-link:hover {
+  text-decoration: underline;
+}
 
-  .details-column .issue {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #333;
-  }
+.person-column {
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
 
-  .documents-link {
-    color: #1e88e5;
-    text-decoration: underline;
-  }
+.actions-column {
+  padding-right: 16px;
+}
 
-  .person-icon {
-    color: #666;
-  }
+.v-card {
+  border-radius: 8px;
+}
 
 </style>

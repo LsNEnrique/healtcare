@@ -28,7 +28,7 @@
       </div>
       <div class="ml-2">
         <v-avatar>
-          <img :src="patientPhoto" alt="Patient photo">
+          <img :src="require('@/assets/patient_photo.jpg')" alt="Patient photo">
         </v-avatar>
       </div>
       <span class="ml-2 font-weight-bold">{{ patientName }}</span>

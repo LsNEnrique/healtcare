@@ -5,17 +5,55 @@
       <h1 class="title">
         Documents
       </h1>
-      <v-btn class="new-document-btn" color="blue" dark @click="showModal = true">
+      <v-btn class="new-document-btn" color="blue" dark @click="showUploadModal = true">
         + New Document
       </v-btn>
     </div>
 
+    <!-- Modal para subir documentos -->
+    <v-dialog v-model="showUploadModal" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Upload Document</span>
+        </v-card-title>
+        <v-card-text>
+          <input type="file" @change="handleFileUpload">
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="blue darken-1" text @click="uploadDocument">
+            Upload
+          </v-btn>
+          <v-btn color="grey" text @click="showUploadModal = false">
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Recuadros con documentos -->
     <div class="documents-grid">
       <div v-for="(document, index) in documents" :key="index" class="document-box">
-        <div class="document-preview">
-          <p>{{ document.title }}</p>
-          <p>Uploaded on: {{ formatDate(document.created_at) }}</p> <!-- Fecha y hora de subida -->
+        <div class="document-header">
+          <v-icon :color="document.starred ? 'yellow' : 'grey'" @click="toggleStar(document)">
+            mdi-star
+          </v-icon>
+          <v-menu offset-y>
+            <template #activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on">
+                mdi-dots-vertical
+              </v-icon>
+            </template>
+            <v-list>
+              <v-list-item @click="deleteDocument(index)">
+                <v-list-item-title>Delete</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <div class="document-preview">
+            <embed :src="document.url" width="150" height="150" type="application/pdf">
+            <p>{{ document.name }}</p>
+            <p>{{ document.date }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -62,62 +100,34 @@ export default {
   layout: 'DefaultLayout',
   data () {
     return {
-      documents: [], // Almacenará los documentos obtenidos
-      showModal: false, // Controla la visibilidad del modal
-      formValid: false, // Controla la validación del formulario
-      newDocument: { title: '', file: null } // Datos del nuevo documento
+      showUploadModal: false,
+      documents: [],
+      newDocument: null
     }
   },
-  async created () {
-    await this.fetchDocuments() // Llamada para obtener los documentos al crear el componente
-  },
   methods: {
-    // Método para obtener los documentos
-    async fetchDocuments () {
-      try {
-        const response = await axios.get('/patientdocuments') // Ruta GET para obtener documentos
-        this.documents = response.data // Asignamos los documentos al array
-      } catch (error) {
-        alert('Error fetching documents: ' + error.message) // Reemplazado por alert
-      }
+    handleFileUpload (event) {
+      this.newDocument = event.target.files[0]
     },
-
-    // Método para agregar un nuevo documento
-    async submitNewDocument () {
-      if (this.formValid) {
-        const formData = new FormData()
-        formData.append('title', this.newDocument.title)
-        formData.append('file', this.newDocument.file)
-
-        try {
-          const response = await axios.post('/newdocument', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data' // Especificamos que se enviarán archivos
-            }
-          })
-
-          if (response.status === 200) {
-            this.fetchDocuments() // Volver a obtener los documentos después de agregar uno nuevo
-            this.closeModal() // Cerrar el modal
-            this.newDocument = { title: '', file: null } // Limpiar los campos del formulario
-            alert('Document uploaded successfully!') // Notificación de éxito
-          }
-        } catch (error) {
-          alert('Error uploading document: ' + error.message) // Reemplazado por alert
+    uploadDocument () {
+      if (this.newDocument) {
+        const document = {
+          url: URL.createObjectURL(this.newDocument),
+          name: this.newDocument.name,
+          date: new Date().toLocaleDateString(),
+          starred: false
         }
+        this.documents.push(document)
+        this.newDocument = null
+        this.showUploadModal = false
       }
     },
-
-    // Método para cerrar el modal
-    closeModal () {
-      this.showModal = false
+    toggleStar (document) {
+      document.starred = !document.starred
     },
+    deleteDocument (index) {
+      this.documents.splice(index, 1)
 
-    // Método para formatear la fecha en formato legible
-    formatDate (dateString) {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }
-      const date = new Date(dateString)
-      return date.toLocaleDateString(undefined, options)
     }
   }
 }

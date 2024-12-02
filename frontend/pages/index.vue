@@ -99,18 +99,111 @@
         <!-- Structure holding doctor information -->
         <v-col cols="4">
           <v-container class="doctor-card">
-            <!-- Same structure as above -->
+            <div class="doctor-info">
+              <v-avatar class="doctor-avatar">
+                <img :src="require('@/assets/doctor1.jpg')" alt="Patient photo">
+              </v-avatar>
+              <div class="doctor-details">
+                <p class="doctor-name">
+                  Amanda Clara
+                </p>
+                <p class="doctor-experience">
+                  Specialist | 12 years of experience
+                </p>
+                <p class="doctor-specialty">
+                  Pediatric
+                </p>
+              </div>
+            </div>
+            <div class="doctor-schedule">
+              <v-icon class="schedule-icon">
+                mdi-clock-outline
+              </v-icon>
+              <p>Tue, Thu</p>
+              <p>10:00AM - 01:00PM</p>
+              <div class="doctor-fee">
+                <v-icon class="fee-icon">
+                  mdi-currency-usd
+                </v-icon>
+                <p>$25 Starting</p>
+              </div>
+            </div>
+            <v-btn class="book-appointment-btn">
+              Book an Appointment
+            </v-btn>
           </v-container>
         </v-col>
         <!-- Repeat Doctor Card structure for other columns -->
         <v-col cols="4">
           <v-container class="doctor-card">
-            <!-- Same structure as above -->
+            <div class="doctor-info">
+              <v-avatar class="doctor-avatar">
+                <img :src="require('@/assets/doctor2.jpg')" alt="Patient photo">
+              </v-avatar>
+              <div class="doctor-details">
+                <p class="doctor-name">
+                  Jason Shatsky
+                </p>
+                <p class="doctor-experience">
+                  Specialist | 10 years of experience
+                </p>
+                <p class="doctor-specialty">
+                  Surgical
+                </p>
+              </div>
+            </div>
+            <div class="doctor-schedule">
+              <v-icon class="schedule-icon">
+                mdi-clock-outline
+              </v-icon>
+              <p>Tue, Thu</p>
+              <p>10:00AM - 01:00PM</p>
+              <div class="doctor-fee">
+                <v-icon class="fee-icon">
+                  mdi-currency-usd
+                </v-icon>
+                <p>$35 Starting</p>
+              </div>
+            </div>
+            <v-btn class="book-appointment-btn">
+              Book an Appointment
+            </v-btn>
           </v-container>
         </v-col>
         <v-col cols="4">
           <v-container class="doctor-card">
-            <!-- Same structure as above -->
+            <div class="doctor-info">
+              <v-avatar class="doctor-avatar">
+                <img :src="require('@/assets/doctor3.jpg')" alt="Patient photo">
+              </v-avatar>
+              <div class="doctor-details">
+                <p class="doctor-name">
+                  Jessie Dux
+                </p>
+                <p class="doctor-experience">
+                  Specialist | 7 years of experience
+                </p>
+                <p class="doctor-specialty">
+                  Gastroentrology
+                </p>
+              </div>
+            </div>
+            <div class="doctor-schedule">
+              <v-icon class="schedule-icon">
+                mdi-clock-outline
+              </v-icon>
+              <p>Tue, Thu</p>
+              <p>10:00AM - 01:00PM</p>
+              <div class="doctor-fee">
+                <v-icon class="fee-icon">
+                  mdi-currency-usd
+                </v-icon>
+                <p>$15 Starting</p>
+              </div>
+            </div>
+            <v-btn class="book-appointment-btn">
+              Book an Appointment
+            </v-btn>
           </v-container>
         </v-col>
       </v-row>
@@ -163,7 +256,6 @@ export default {
   padding-right: 15px;
 }
 
-/* New Content Styles */
 .main-container {
   background-color: white;
   display: flex;
@@ -225,89 +317,73 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 20px 20px 30px;
+  padding: 20px 20px -10px;
   gap: 10px;
   width: 374.67px;
   height: 259px;
   background: #FFFFFF;
   border: 1px solid #E5E5E5;
   border-radius: 16px;
-  margin: 30px
-}
-
-.frame {
-  display: flex;
-  align-items: flex-start;
-  padding: 0px;
-  gap: 16px;
-}
-
-.ellipse-191 {
-  width: 65px;
-  height: 65px;
-}
-
-.doctor-name {
-  width: 121px;
-  height: 27px;
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 150%;
-  display: flex;
-  align-items: center;
-  color: #000000;
+  margin: 30px;
 }
 
 .doctor-info {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
+  display: flex;
+  width: 100%;
+  height: 30%;
+}
+
+.doctor-avatar {
+  flex: 1;
+}
+
+.doctor-details {
+  flex: 2;
+  padding-left: 10px;
+}
+
+.doctor-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0;
+}
+
+.doctor-experience {
   font-size: 14px;
-  line-height: 150%;
+  margin: 0;
+}
+
+.doctor-specialty {
+  background-color: #EBFFFA;
+  color: #3B9AB8;
+  margin: 0;
+}
+
+.doctor-schedule {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 20%;
+  font-size: 12px;
+}
+
+.schedule-icon,
+.fee-icon {
+  margin-right: 5px;
+}
+
+.doctor-fee {
   display: flex;
   align-items: center;
-  color: #7A7D84;
+  color: #3B9AB8;
+  font-size: 12px;
 }
 
-.appointment-btn {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  gap: 10px;
-  width: 334.67px;
-  height: 40px;
-  background: #3B9AB8;
-  border-radius: 8px;
-  color: #FFFFFF;
-}
-
-.v-container {
-  background-color: white;
-}
-
-.v-application {
-  background-color: white !important;
-}
-
-.text-black {
-  color: black;
-}
-
-.justify-text {
-  text-align: justify;
-}
-
-.footer {
-  margin: 16px 0;
-  padding: 10px;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: center;
+.book-appointment-btn {
+  background-color: #3B9AB8 !important;
+  color: white !important;
+  width: 100%;
+  margin-top: 10px;
 }
 </style>
