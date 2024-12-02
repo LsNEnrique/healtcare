@@ -93,6 +93,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'default_doctor',
   data () {
@@ -115,12 +117,32 @@ export default {
       this.fees = ''
       this.currency = 'USD'
     },
-    saveConfig () {
-      alert('Configuration saved successfully!')
+    // Enviar la configuración de disponibilidad al backend
+    async saveConfig () {
+      try {
+        const configData = {
+          availability: this.availability,
+          typeOfAvailability: this.typeOfAvailability,
+          duration: this.duration,
+          fees: this.fees,
+          currency: this.currency
+        }
+
+        const response = await axios.post('/api/disponibilidad', configData)
+
+        // Manejamos la respuesta del servidor
+        if (response.status === 200) {
+          alert('Configuration saved successfully!')
+          this.resetConfig() // Restablecemos los valores después de guardar
+        } else {
+          alert('Error saving configuration.')
+        }
+      } catch (error) {
+        alert('An error occurred while saving the configuration.' + error.message)
+      }
     }
   }
 }
 </script>
-
 <style scoped>
 </style>

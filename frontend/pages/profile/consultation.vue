@@ -32,7 +32,7 @@
     <div class="appointments">
       <div v-for="(appointment, index) in groupedAppointments" :key="index" class="appointment-group">
         <h3>{{ appointment.dateLabel }}</h3>
-        <div v-for="(appointmentItem, index) in appointment.appointments" :key="index" class="appointment-box">
+        <div v-for="(appointmentItem, innerIndex) in appointment.appointments" :key="innerIndex" class="appointment-box">
           <p>{{ appointmentItem.time }} - {{ appointmentItem.description }}</p>
         </div>
       </div>
@@ -138,6 +138,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   layout: 'DefaultLayout',
   data () {
@@ -147,24 +148,19 @@ export default {
         { text: '🇲🇽 +52', value: '+52' }
         // Add more extensions as needed
       ],
-      selectedMonth: null,
-      selectedYear: 2024,
+      doctors: [], // Lista de doctores disponibles
+      doctorId: null, // ID del doctor seleccionado
+      doctor_name: '',
+      duration_time_minutes: '',
+      fee_amount: '',
+      appointments: [], // Citas obtenidas
+      selectedMonth: null, // Mes seleccionado para el filtro
+      selectedYear: 2024, // Año seleccionado para el filtro
       selectedMonthYear: '',
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      appointments: [
-        { date: this.getYesterday(), time: '10:00 AM', description: 'Check-up' },
-        { date: this.getToday(), time: '2:00 PM', description: 'Follow-up' },
-        { date: this.getTomorrow(), time: '9:00 AM', description: 'Consultation' },
-        { date: this.getToday(), time: '11:00 AM', description: 'Vaccination' },
-        { date: this.getYesterday(), time: '1:00 PM', description: 'Routine check' }
-      ],
       showModal: false,
       modalStep: 1,
-      doctor_name: 'Dr. John Doe',
-      duration_time_minutes: '30 mins',
-      fee_amount: '$50',
       focus: new Date().toISOString().slice(0, 10),
-      displayDate: '',
       selectedTime: null,
       patientEmail: '',
       contactNumber: '',
@@ -182,64 +178,116 @@ export default {
       ]
 
       this.appointments.forEach((appointment) => {
-        const dateStr = appointment.date
-        if (dateStr === this.getYesterday()) {
+        const appointmentDate = new Date(appointment.date)
+        if (this.isSameDay(appointmentDate, this.getYesterday())) {
           groups[0].appointments.push(appointment)
-        } else if (dateStr === this.getToday()) {
+        } else if (this.isSameDay(appointmentDate, this.getToday())) {
           groups[1].appointments.push(appointment)
-        } else if (dateStr === this.getTomorrow()) {
+        } else if (this.isSameDay(appointmentDate, this.getTomorrow())) {
           groups[2].appointments.push(appointment)
         }
       })
 
       return groups
     },
+
+    filteredAppointments () {
+      // Filtrar las citas por mes y año seleccionados
+      const filteredByMonth = this.appointments.filter((appointment) => {
+        const appointmentDate = new Date(appointment.date)
+        const appointmentMonth = appointmentDate.getMonth()
+        const appointmentYear = appointmentDate.getFullYear()
+        return appointmentMonth === this.selectedMonth && appointmentYear === this.selectedYear
+      })
+
+      return filteredByMonth
+    },
+
     displayMonth () {
       const date = new Date(this.focus)
       const options = { month: 'long', year: 'numeric' }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.displayDate = date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
-      // this.displayDate = date.toLocaleDateString(undefined, options)
       return date.toLocaleDateString(undefined, options)
     }
   },
+
+  mounted () {
+    // Obtener las citas del paciente al cargar la página
+    this.fetchAppointments()
+  },
   methods: {
-    viewDay ({ date }) {
-      this.focus = date
+    async fetchAppointments () {
+      try {
+        const response = await axios.get('/api/patientCitas')
+        this.appointments = response.data.map(cita => ({
+          date: cita.date,
+          time: cita.time,
+          description: cita.description
+        }))
+        this.filterAppointmentsByMonth()
+      } catch (error) {
+        alert('Error al obtener las citas: ' + error.message)
+      }
     },
-    prevMonth () {
-      const date = new Date(this.focus)
-      date.setMonth(date.getMonth() - 1)
-      this.focus = date.toISOString().slice(0, 10)
+
+    // Método para obtener la disponibilidad del doctor
+    async fetchDoctorAvailability (doctorId) {
+      try {
+        const response = await axios.get('/api/disponibilidad', { params: { doctor_id: doctorId } })
+        const doctorData = response.data
+        this.doctor_name = doctorData.name
+        this.duration_time_minutes = doctorData.duration
+        this.fee_amount = doctorData.fee
+      } catch (error) {
+        alert('Error al obtener la información del doctor: ' + error.message)
+      }
     },
-    nextMonth () {
-      const date = new Date(this.focus)
-      date.setMonth(date.getMonth() + 1)
-      this.focus = date.toISOString().slice(0, 10)
+
+    // Filtra las citas por el mes seleccionado
+    filterAppointmentsByMonth () {
+      if (this.selectedMonth !== null && this.selectedYear !== null) {
+        this.appointments = this.filteredAppointments
+      }
     },
-    getYesterday () {
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-      return this.formatDate(yesterday)
+
+    // Método para agendar una nueva cita
+    async createNewAppointment () {
+      const appointmentData = {
+        patientEmail: this.patientEmail,
+        contactNumber: this.contactNumber,
+        selectedTime: this.selectedTime,
+        selectedProblem: this.selectedProblem,
+        paymentMethod: this.paymentMethod,
+        doctor_id: this.doctorId
+      }
+
+      try {
+        const response = await axios.post('/api/agendar', appointmentData)
+        if (response.status === 200) {
+          alert('Cita agendada con éxito')
+          this.showModal = false
+          this.fetchAppointments() // Refrescar las citas después de agendar una nueva
+        }
+      } catch (error) {
+        alert('Error al agendar la cita: ' + error.message)
+      }
     },
-    getToday () {
-      const today = new Date()
-      return this.formatDate(today)
+    watch: {
+      focus (newVal) {
+        const date = new Date(newVal)
+        this.displayDate = date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+      }
     },
-    getTomorrow () {
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      return this.formatDate(tomorrow)
-    },
-    formatDate (date) {
-      return date.toISOString().split('T')[0] // YYYY-MM-DD
-    },
+    // Método para cambiar el mes seleccionado
     onMonthYearChange () {
-      // Handle month and year change
+      const [month, year] = this.selectedMonthYear.split(' ')
+      this.selectedMonth = this.months.indexOf(month)
+      this.selectedYear = parseInt(year)
+      this.filterAppointmentsByMonth() // Filtrar las citas según el mes y año seleccionados
     },
-    createNewAppointment () {
-      // Logic to create a new appointment
+    confirmAppointment () {
+      this.createNewAppointment()
     },
+
     closeModal () {
       if (this.modalStep !== 1) {
         this.modalStep = 1
@@ -247,17 +295,33 @@ export default {
         this.showModal = false
       }
     },
+
     nextStep () {
       this.modalStep = 2
     },
-    confirmAppointment () {
-      // logic to insert appointment
-      this.modalStep = 1
-      this.showModal = false
+
+    // Métodos para obtener las fechas de ayer, hoy, y mañana
+    getYesterday () {
+      const today = new Date()
+      today.setDate(today.getDate() - 1)
+      return today.toISOString().split('T')[0] // Retorna la fecha de ayer en formato YYYY-MM-DD
+    },
+
+    getToday () {
+      return new Date().toISOString().split('T')[0] // Retorna la fecha de hoy en formato YYYY-MM-DD
+    },
+
+    getTomorrow () {
+      const today = new Date()
+      today.setDate(today.getDate() + 1)
+      return today.toISOString().split('T')[0] // Retorna la fecha de mañana en formato YYYY-MM-DD
+    },
+
+    isSameDay (date1, date2) {
+      return date1.toISOString().split('T')[0] === date2.toISOString().split('T')[0]
     }
   }
-}
-</script>
+}</script>
 
 <style scoped>
 .appointment-history-container {
