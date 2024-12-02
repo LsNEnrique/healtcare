@@ -1,6 +1,11 @@
 <template>
   <v-container>
     <v-row>
+      <v-col cols="12">
+        <h2 class="header">
+          Yesterday's Appointments
+        </h2>
+      </v-col>
       <v-col v-for="(item, index) in appointments" :key="index" cols="12">
         <v-card class="pa-0 mb-4" outlined>
           <v-row align="center">
@@ -123,6 +128,12 @@ export default {
 .time {
   font-size: 0.9rem;
   color: #4a4a4a;
+}
+
+.header {
+    font-size: 1.4rem;
+    color: #444;
+    margin-bottom: 20px;
 }
 
 .issue {

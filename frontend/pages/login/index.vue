@@ -2,7 +2,6 @@
   <v-app>
     <div class="login-container">
       <!-- Left Side -->
-      <!-- Image -->
       <div class="left-side">
         <v-container>
           <v-icon color="white" class="logo-text">
@@ -32,10 +31,10 @@
               </v-btn>
             </p>
 
-            <v-form>
-              <v-text-field label="Email address" outlined />
-              <v-text-field label="Your password" type="password" outlined />
-              <v-btn class="login-button" block color="#3B9AB8" @click="$router.push('/dashboard-after')">
+            <v-form ref="form" v-model="valid" @submit.prevent="handleLogin">
+              <v-text-field v-model="email" label="Email address" outlined :rules="[rules.required, rules.email]" />
+              <v-text-field v-model="password" label="Your password" type="password" outlined :rules="[rules.required]" />
+              <v-btn class="login-button" block color="#3B9AB8" type="submit">
                 Log In
               </v-btn>
             </v-form>
@@ -80,100 +79,131 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-  layout: 'no-sideBar'
+  layout: 'no-sideBar',
+  data () {
+    return {
+      email: '',
+      password: '',
+      valid: false,
+      rules: {
+        required: value => !!value || 'Required.',
+        email: value => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
+      }
+    }
+  },
+  methods: {
+    async handleLogin () {
+      if (this.$refs.form.validate()) {
+        try {
+          const response = await axios.post('http://localhost:3000/login', {
+            email: this.email,
+            password: this.password
+          })
+
+          if (response.status === 200) {
+            this.$router.push('/dashboard-after')
+          }
+        } catch (error) {
+          console.error('Error logging in:', error)
+        }
+      }
+    }
+  }
 }
+
 </script>
 
-  <style scoped>
-  .login-container {
-    display: flex;
-    height: 120vh;
-  }
+<style scoped>
+.login-container {
+  display: flex;
+  height: 120vh;
+}
 
-  .left-side {
-    /*background-color: #869CA3;*/
-    background: linear-gradient(91.63deg, #4c6169 -4.01%, #568392 90.53%);
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.left-side {
+  background: linear-gradient(91.63deg, #4c6169 -4.01%, #568392 90.53%);
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .image-container {
-    position: relative;
-    width: 730px;
-    height: auto;
-    top: 33px;
-    left: -35px;
-  }
+.image-container {
+  position: relative;
+  width: 730px;
+  height: auto;
+  top: 33px;
+  left: -35px;
+}
 
-  .right-side {
-    background-color: white;
-    width: 50%;
-    position: relative;
-  }
+.right-side {
+  background-color: white;
+  width: 50%;
+  position: relative;
+}
 
-  .close-btn {
-    align-self: flex-end;
-    margin: 16px;
-    background-color: white !important;
-    color: #000 !important;
-  }
+.close-btn {
+  align-self: flex-end;
+  margin: 16px;
+  background-color: white !important;
+  color: #000 !important;
+}
 
-  .login-box {
-    width: 400px;
-    text-align: center;
-  }
+.login-box {
+  width: 400px;
+  text-align: center;
+}
 
-  .logo-text {
-    text-align: center;
-    font-size: 48px;
-    color: white;
-    margin-bottom: 16px;
-    font-weight: bold;
-  }
+.logo-text {
+  text-align: center;
+  font-size: 48px;
+  color: white;
+  margin-bottom: 16px;
+  font-weight: bold;
+}
 
-  .welcome-text {
-    font-size: 48px;
-    color: black;
-    margin-bottom: 16px;
-  }
+.welcome-text {
+  font-size: 48px;
+  color: black;
+  margin-bottom: 16px;
+}
 
-  .signup-text {
-    font-size: 20px;
-    color: gray;
-  }
+.signup-text {
+  font-size: 20px;
+  color: gray;
+}
 
-  .signup-link {
-    color: #3B9AB8;
-  }
+.signup-link {
+  color: #3B9AB8;
+}
 
-  .login-button {
-    background-color: #3B9AB8;
-    color: white;
-    margin-top: 16px;
-  }
+.login-button {
+  background-color: #3B9AB8;
+  color: white;
+  margin-top: 16px;
+}
 
-  .additional-links {
-    font-size: 14px;
-  }
+.additional-links {
+  font-size: 14px;
+}
 
-  .remind-checkbox {
-    color: gray;
-  }
+.remind-checkbox {
+  color: gray;
+}
 
-  .forgot-password {
-    color: #3B9AB8;
-  }
+.forgot-password {
+  color: #3B9AB8;
+}
 
-  .login-with-text {
-    margin-top: 16px;
-    color: gray;
-    font-size: 14px;
-  }
+.login-with-text {
+  margin-top: 16px;
+  color: gray;
+  font-size: 14px;
+}
 
-  .social-buttons {
-    margin-top: 8px;
-  }
-  </style>
+.social-buttons {
+  margin-top: 8px;
+}
+</style>

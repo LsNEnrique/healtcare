@@ -5,18 +5,55 @@
       <h1 class="title">
         Documents
       </h1>
-      <nuxt-link to="/profile/new-document">
-        <v-btn class="new-document-btn" color="blue" dark>
-          + New Document
-        </v-btn>
-      </nuxt-link>
+      <v-btn class="new-document-btn" color="blue" dark @click="showUploadModal = true">
+        + New Document
+      </v-btn>
     </div>
+
+    <!-- Modal para subir documentos -->
+    <v-dialog v-model="showUploadModal" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Upload Document</span>
+        </v-card-title>
+        <v-card-text>
+          <input type="file" @change="handleFileUpload">
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="blue darken-1" text @click="uploadDocument">
+            Upload
+          </v-btn>
+          <v-btn color="grey" text @click="showUploadModal = false">
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Recuadros con documentos -->
     <div class="documents-grid">
       <div v-for="(document, index) in documents" :key="index" class="document-box">
-        <div class="document-preview">
-          <p>{{ document.title }}</p>
+        <div class="document-header">
+          <v-icon :color="document.starred ? 'yellow' : 'grey'" @click="toggleStar(document)">
+            mdi-star
+          </v-icon>
+          <v-menu offset-y>
+            <template #activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on">
+                mdi-dots-vertical
+              </v-icon>
+            </template>
+            <v-list>
+              <v-list-item @click="deleteDocument(index)">
+                <v-list-item-title>Delete</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <div class="document-preview">
+            <embed :src="document.url" width="150" height="150" type="application/pdf">
+            <p>{{ document.name }}</p>
+            <p>{{ document.date }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -25,7 +62,38 @@
 
 <script>
 export default {
-  layout: 'DefaultLayout'
+  layout: 'DefaultLayout',
+  data () {
+    return {
+      showUploadModal: false,
+      documents: [],
+      newDocument: null
+    }
+  },
+  methods: {
+    handleFileUpload (event) {
+      this.newDocument = event.target.files[0]
+    },
+    uploadDocument () {
+      if (this.newDocument) {
+        const document = {
+          url: URL.createObjectURL(this.newDocument),
+          name: this.newDocument.name,
+          date: new Date().toLocaleDateString(),
+          starred: false
+        }
+        this.documents.push(document)
+        this.newDocument = null
+        this.showUploadModal = false
+      }
+    },
+    toggleStar (document) {
+      document.starred = !document.starred
+    },
+    deleteDocument (index) {
+      this.documents.splice(index, 1)
+    }
+  }
 }
 </script>
 

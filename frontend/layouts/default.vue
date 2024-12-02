@@ -126,7 +126,7 @@
               Hi, {{ patientName }}
             </div>
             <div class="text-h4 font-weight-bold">
-              Welcome Back
+              {{ headerText }}
             </div>
           </div>
           <!-- Search bar -->
@@ -206,6 +206,7 @@ export default {
       selectedButton: 'general',
       miniVariant: false,
       right: false,
+      headerText: 'Welcome Back!',
       items: [
         {
           icon: 'mdi-view-dashboard',
@@ -241,7 +242,7 @@ export default {
       return this.$route.path.startsWith('/profile')
     },
     isPatientDashboard () {
-      return this.$route.path.startsWith('/dashboard-after')
+      return this.$route.path.startsWith('/dashboard-after') || this.$route.path.startsWith('/calendar')
     }
   },
   methods: {
@@ -255,13 +256,21 @@ export default {
 </script>
 
 <style scoped>
-.sidebar-item {
-  background-color: white;
-}
+  .sidebar-item {
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  .sidebar-item:hover {
+    background-color: rgba(59, 154, 184, 0.1);
+  }
 
-.selected-item {
-  background-color: #3B9AB8 !important;
-}
+  .selected-item {
+    /* background-color: rgba(59, 154, 184, 0.2); */
+    background-color: #3B9AB8 !important;
+    color: white;
+  }
 
 .v-list-item-icon {
   margin-right: 8px;
