@@ -24,15 +24,12 @@
           v-for="day in calendarDays"
           :key="day.date"
           :class="['day', { 'empty-day': !day.day }]"
+          @click="seleccionarDia(day)"
         >
           <template v-if="day.day">
             <div class="appointments">
-              <span
-                v-for="appointment in day.appointments"
-                :key="appointment"
-                class="appointment"
-              >
-                {{ appointment }}
+              <span v-for="appointment in day.appointments" :key="appointment.id" class="appointment">
+                {{ appointment.pacienteId }}
               </span>
             </div>
             <span class="day-number">{{ day.day }}</span>
@@ -46,36 +43,32 @@
       <h2>Upcoming</h2>
       <h3>Today</h3>
       <div v-for="item in todayAppointments" :key="item.id" class="card">
-        <h4>{{ item.title }}</h4>
-        <p>{{ item.time }}</p>
-        <span class="date">{{ item.date }}</span>
+        <h4>{{ item.pacienteId }}</h4>
+        <p>{{ item.fecha }}</p>
       </div>
       <h3>Tomorrow</h3>
       <div v-for="item in tomorrowAppointments" :key="item.id" class="card">
-        <h4>{{ item.title }}</h4>
-        <p>{{ item.time }}</p>
-        <span class="date">{{ item.date }}</span>
+        <h4>{{ item.pacienteId }}</h4>
+        <p>{{ item.fecha }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 
 export default {
   layout: 'default_doctor',
   data () {
     return {
-      currentMonth: new Date().getMonth(), // Mes actual (0 = Enero)
-      currentYear: new Date().getFullYear(), // Año actual
-      todayAppointments: [
-        { id: 1, title: 'Meeting', time: '10:00 AM - 11:00 AM', date: '2024-11-18' },
-        { id: 2, title: 'Dentist', time: '2:00 PM - 3:00 PM', date: '2024-11-18' }
-      ],
-      tomorrowAppointments: [
-        { id: 3, title: 'Workshop', time: '9:00 AM - 12:00 PM', date: '2024-11-19' }
-      ],
-      weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] // Encabezados de los días
+      currentMonth: new Date().getMonth(),
+      currentYear: new Date().getFullYear(),
+      weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      citas: [], // All the doctor's appointments
+      todayAppointments: [], // Appointments for today
+      tomorrowAppointments: [], // Appointments for tomorrow
+      selectedDate: null
     }
   },
   computed: {
@@ -96,17 +89,22 @@ export default {
       for (let i = 1; i <= daysInMonth; i++) {
         days.push({
           day: i,
-          appointments: this.generateRandomAppointments()
+          appointments: this.getAppointmentsForDay(i)
         })
       }
 
       return days
     }
   },
+  mounted () {
+    this.loadCitas() // Cargar las citas cuando se monte el componente
+  },
   methods: {
-    generateRandomAppointments () {
-      const numAppointments = Math.floor(Math.random() * 4) // Hasta 4 citas por día
-      return Array.from({ length: numAppointments }, (_, i) => i + 1)
+    getAppointmentsForDay (day) {
+      // const date = new Date(this.currentYear, this.currentMonth, day)
+      const formattedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+
+      return this.citas.filter(cita => cita.fecha === formattedDate)
     },
     nextMonth () {
       if (this.currentMonth === 11) {
@@ -115,6 +113,7 @@ export default {
       } else {
         this.currentMonth += 1
       }
+      this.loadCitas()
     },
     previousMonth () {
       if (this.currentMonth === 0) {
@@ -123,6 +122,27 @@ export default {
       } else {
         this.currentMonth -= 1
       }
+      this.loadCitas()
+    },
+    seleccionarDia (day) {
+      if (!day.day) { return }
+      this.selectedDate = `${this.currentYear}-${this.currentMonth + 1}-${day.day}`
+    },
+    async loadCitas () {
+      try {
+        const response = await axios.post('/api/myCitas', { doctorId: 'doctorId' })
+        this.citas = response.data
+
+        // Filtrar las citas para mostrar las del día de hoy y del día siguiente
+        this.todayAppointments = this.filterAppointmentsForDay(new Date())
+        this.tomorrowAppointments = this.filterAppointmentsForDay(new Date(Date.now() + 86400000)) // Sumar 24 horas
+      } catch (error) {
+        console.error('Error al cargar las citas:', error)
+      }
+    },
+    filterAppointmentsForDay (date) {
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      return this.citas.filter(cita => cita.fecha === formattedDate)
     }
   }
 }

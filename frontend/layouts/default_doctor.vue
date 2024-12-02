@@ -420,8 +420,8 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 1rem 2rem;
+    margin-left: 80%;
     align-items: center;
-    margin-top: 1rem;
   }
 
   .v-btn.outlined {

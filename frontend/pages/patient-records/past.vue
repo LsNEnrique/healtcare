@@ -69,29 +69,64 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'default_doctor',
   data () {
-    const today = new Date()
-    today.setDate(today.getDate() - 2) // Two days ago
-    const beforeYesterdayDate = today.toISOString().split('T')[0] // Fecha antes de ayer (YYYY-MM-DD)
-
     return {
-      beforeYesterdayDate,
-      appointments: [
-        { day: 'Mon', date: '2024-11-25', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', status: 'confirmed' },
-        { day: 'Sat', date: '2024-11-23', time: '10:00am - 10:30am', issue: 'Headache', documents: '#', person: 'John Doe', status: 'confirmed' },
-        { day: 'Sun', date: '2024-11-24', time: '11:00am - 11:30am', issue: 'Cold', documents: '#', person: 'Jane Smith', status: 'confirmed' },
-        { day: 'Fri', date: '2024-11-22', time: '09:00am - 09:30am', issue: 'Cough', documents: null, person: 'Alice Johnson', status: 'confirmed' }
-      ]
+      allAppointments: [],
+      beforeYesterdayAppointments: []
     }
   },
+  async mounted () {
+    await this.fetchAppointments()
+  },
+  methods: {
+    async fetchAppointments () {
+      try {
+        const doctorId = 'doctor123' // Reemplazar con el ID real del doctor
+        const response = await axios.post('/api/myCitas', { doctorId })
+        this.appointments = response.data.map(cita => ({
+          day: this.formatDay(cita.fecha),
+          date: this.formatDate(cita.fecha),
+          time: this.formatTime(cita.fecha),
+          issue: cita.issue || 'General Check-up',
+          documents: cita.documents || null,
+          person: cita.pacienteId || 'Paciente desconocido'
+        }))
+
+        // Filtramos las citas para obtener solo las de antes de ayer
+        this.filterAppointmentsWithinLast5Days()
+      } catch (error) {
+        alert('Error al obtener las citas: ' + error.message)
+      }
+    },
+    filterAppointmentsWithinLast5Days () {
+      const today = new Date()
+      today.setDate(today.getDate() - 2) // Fecha de ayer
+      const beforeYesterdayDate = today.toISOString().split('T')[0] // Formato YYYY-MM-DD (antes de ayer)
+
+      // Calculamos los últimos 5 días antes de ayer
+      const fiveDaysAgo = new Date(today)
+      fiveDaysAgo.setDate(today.getDate() - 5) // Fecha 5 días antes de ayer
+      const fiveDaysAgoDate = fiveDaysAgo.toISOString().split('T')[0] // Formato YYYY-MM-DD
+
+      // Filtramos las citas para obtener solo las que están entre estos 5 días
+      const filteredAppointments = this.allAppointments.filter((appointment) => {
+        return appointment.date >= fiveDaysAgoDate && appointment.date <= beforeYesterdayDate
+      })
+
+      // Asignamos las citas filtradas a la propiedad
+      this.beforeYesterdayAppointments = filteredAppointments
+
   computed: {
     beforeYesterdayAppointments () {
       return this.appointments.filter(
         appointment => appointment.date <= this.beforeYesterdayDate
       )
     }
+
   }
 }
 </script>

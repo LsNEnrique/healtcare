@@ -69,25 +69,41 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'default_doctor',
   data () {
     const todayDate = new Date().toISOString().split('T')[0] // Fecha actual (YYYY-MM-DD)
     return {
-      todayDate,
-      appointments: [
-        { day: 'Mon', date: todayDate, time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', status: 'confirmed' },
-        { day: 'Mon', date: todayDate, time: '10:00am - 10:30am', issue: 'Headache', documents: '#', person: 'John Doe', status: 'confirmed' },
-        { day: 'Tue', date: todayDate, time: '11:00am - 11:30am', issue: 'Cold', documents: '#', person: 'Jane Smith', status: 'confirmed' },
-        { day: 'Fri', date: todayDate, time: '09:00am - 09:30am', issue: 'Cough', documents: null, person: 'Alice Johnson', status: 'confirmed' }
-      ]
+      todayDate: new Date().toISOString().split('T')[0], // Fecha actual (YYYY-MM-DD)
+      appointments: []
     }
   },
   computed: {
     todayAppointments () {
+      // Filtramos las citas para mostrar solo las que son del día de hoy
       return this.appointments.filter(
         appointment => appointment.date === this.todayDate
       )
+    }
+  },
+  methods: {
+    async fetchAppointments () {
+      try {
+        const doctorId = 'doctor123'
+        const response = await axios.post('/api/myCitas', { doctorId })
+        this.appointments = response.data.map(cita => ({
+          day: this.formatDay(cita.fecha),
+          date: this.formatDate(cita.fecha),
+          time: this.formatTime(cita.fecha),
+          issue: cita.issue || 'General Check-up',
+          documents: cita.documents || null,
+          person: cita.pacienteId || 'Paciente desconocido'
+        }))
+      } catch (error) {
+        alert('Error al obtener las citas: ' + error.message)
+      }
     }
   }
 }

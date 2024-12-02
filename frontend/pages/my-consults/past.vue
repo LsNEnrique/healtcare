@@ -72,24 +72,21 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'default_doctor',
   data () {
     return {
-      appointments: [
-        { month: "May'23", day: 'Thu', date: '15', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', dateObj: new Date('2023-05-15') },
-        { month: "May'23", day: 'Fri', date: '16', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', dateObj: new Date('2023-05-16') },
-        { month: "May'23", day: 'Mon', date: '19', time: '09:00am - 09:30am', issue: 'Fever', documents: null, person: 'Stephine Claire', dateObj: new Date('2023-05-19') },
-        { month: "June'23", day: 'Mon', date: '02', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', dateObj: new Date('2023-06-02') },
-        { month: "June'23", day: 'Tue', date: '03', time: '09:00am - 09:30am', issue: 'Fever', documents: '#', person: 'Stephine Claire', dateObj: new Date('2023-06-03') },
-        { month: "June'23", day: 'Wed', date: '04', time: '09:00am - 09:30am', issue: 'Fever', documents: null, person: 'Stephine Claire', dateObj: new Date('2023-06-04') }
-      ]
+      appointments: []
     }
   },
   computed: {
     pastAppointments () {
       const today = new Date()
-      return this.appointments.filter(appointment => appointment.dateObj < today)
+      return this.appointments.filter(
+        appointment => new Date(appointment.dateObj) < today
+      )
     },
     pastAppointmentsGrouped () {
       const groups = []
@@ -104,6 +101,46 @@ export default {
       })
 
       return groups
+    }
+  },
+  mounted () {
+    this.fetchAppointments()
+  },
+  methods: {
+    async fetchAppointments () {
+      try {
+        const doctorId = 'doctor123' // Reemplaza con el ID del doctor
+        const response = await axios.post('/api/myCitas', { doctorId })
+
+        this.appointments = response.data.map(cita => ({
+          month: this.formatMonth(cita.fecha),
+          day: this.formatDay(cita.fecha),
+          date: this.formatDate(cita.fecha),
+          time: this.formatTime(cita.fecha),
+          issue: cita.issue || 'General Check-up',
+          documents: cita.documents || null,
+          person: cita.pacienteId || 'Paciente desconocido',
+          dateObj: new Date(cita.fecha)
+        }))
+      } catch (error) {
+        alert('Error al obtener las citas: ' + error.message)
+      }
+    },
+    formatMonth (fecha) {
+      const date = new Date(fecha)
+      return date.toLocaleString('default', { month: 'long', year: 'numeric' })
+    },
+    formatDay (fecha) {
+      const date = new Date(fecha)
+      return date.toLocaleString('default', { weekday: 'short' })
+    },
+    formatDate (fecha) {
+      const date = new Date(fecha)
+      return date.getDate()
+    },
+    formatTime (fecha) {
+      const date = new Date(fecha)
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   }
 }

@@ -320,8 +320,8 @@ export default {
   background-color: black;
   bottom: 0;
   width: 100%;
-  border-top-left-radius: 95px; /* Rounded top left */
-  border-top-right-radius: 95px; /* Rounded top right */
+  border-top-left-radius: 95px;
+  border-top-right-radius: 95px;
 }
 
 .bottom-text {
@@ -348,7 +348,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   width: 83.1%;
-  margin-left: auto; /* Alinea la barra a la derecha */
+  margin-left: auto;
   padding: 16px;
   background-color: #f5f5f5;
   position: relative;
@@ -358,7 +358,7 @@ export default {
 
 }
 .app-background {
-  background-color: #f5f5f5; /* Mismo color que el app-bar */
+  background-color: #f5f5f5;
   min-height: 100vh;
   padding: 0;
   margin: 0;
@@ -383,7 +383,7 @@ export default {
 }
 
 .button-row {
-  margin-bottom: 0; /* Elimina el margen inferior */
+  margin-bottom: 0;
 }
 
 .nav-btn {

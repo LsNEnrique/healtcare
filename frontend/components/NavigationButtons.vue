@@ -27,7 +27,7 @@ export default {
   display: flex;
   align-items: center;
   width: 83.1%;
-  margin-left: auto; /* Alinea la barra a la derecha */
+  margin-left: auto;
   padding: 16px;
   background-color: white;
   position: relative;

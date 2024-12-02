@@ -69,36 +69,63 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'default_doctor',
   data () {
     return {
-      appointments: [
-        {
-          day: 'Thu',
-          date: '15',
-          time: '09:00am - 09:30am',
-          issue: 'Fever',
-          documents: '#',
-          person: 'Stephine Claire'
-        },
-        {
-          day: 'Fri',
-          date: '16',
-          time: '09:00am - 09:30am',
-          issue: 'Fever',
-          documents: '#',
-          person: 'Stephine Claire'
-        },
-        {
-          day: 'Mon',
-          date: '19',
-          time: '09:00am - 09:30am',
-          issue: 'Fever',
-          documents: null,
-          person: 'Stephine Claire'
-        }
-      ]
+      appointments: []
+    }
+  },
+  computed: {
+    // Calcula la fecha de ayer
+    yesterday () {
+      const today = new Date()
+      const yesterday = new Date(today)
+      yesterday.setDate(today.getDate() - 1) // Establece ayer como el día anterior
+      return yesterday.toISOString().split('T')[0] // Formato YYYY-MM-DD
+    },
+    // Filtra las citas que son para el día de ayer
+    yesterdayAppointments () {
+      return this.appointments.filter((appointment) => {
+        const appointmentDate = new Date(appointment.dateObj).toISOString().split('T')[0]
+        return appointmentDate === this.yesterday // Compara con la fecha de ayer
+      })
+    }
+  },
+  mounted () {
+    this.fetchAppointments()
+  },
+  methods: {
+    async fetchAppointments () {
+      try {
+        const doctorId = 'doctor123' // Reemplazar con el ID real del doctor
+        const response = await axios.post('/api/myCitas', { doctorId })
+        this.appointments = response.data.map(cita => ({
+          day: this.formatDay(cita.fecha),
+          date: this.formatDate(cita.fecha),
+          time: this.formatTime(cita.fecha),
+          issue: cita.issue || 'General Check-up',
+          documents: cita.documents || null,
+          person: cita.pacienteId || 'Paciente desconocido',
+          dateObj: new Date(cita.fecha)
+        }))
+      } catch (error) {
+        alert('Error al obtener las citas: ' + error.message)
+      }
+    },
+    formatDay (fecha) {
+      const date = new Date(fecha)
+      return date.toLocaleString('default', { weekday: 'short' })
+    },
+    formatDate (fecha) {
+      const date = new Date(fecha)
+      return date.getDate()
+    },
+    formatTime (fecha) {
+      const date = new Date(fecha)
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   }
 }

@@ -57,10 +57,45 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para subir un nuevo documento -->
+    <v-dialog v-model="showModal" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Upload New Document</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" v-model="formValid">
+            <v-text-field
+              v-model="newDocument.title"
+              label="Document Title"
+              outlined
+              required
+            />
+            <v-file-input
+              v-model="newDocument.file"
+              label="Select File"
+              accept=".pdf,.doc,.docx,.txt"
+              outlined
+              required
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="blue" text @click="closeModal">
+            Cancel
+          </v-btn>
+          <v-btn color="blue" text @click="submitNewDocument">
+            Upload
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   layout: 'DefaultLayout',
   data () {
@@ -92,13 +127,14 @@ export default {
     },
     deleteDocument (index) {
       this.documents.splice(index, 1)
+
     }
   }
 }
 </script>
 
 <style scoped>
-template{
+.template {
   background-color: #f5f5f5;
 }
 
@@ -124,7 +160,7 @@ template{
 }
 
 .new-document-btn {
-  background-color: #1976D2;
+  background-color: #1976d2;
   color: white;
 }
 
@@ -149,5 +185,9 @@ template{
   text-align: center;
   color: #333;
   font-size: 16px;
+}
+
+.v-dialog {
+  overflow: visible;
 }
 </style>
